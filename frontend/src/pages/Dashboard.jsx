@@ -1,7 +1,10 @@
 import React, { useState } from 'react';
 import { Home, Users, Car, BarChart3, Calendar, Mail, Archive, Clock, Layers, FileText, Grid, TrendingUp, TrendingDown, Facebook, Twitter, Linkedin, Bell, Search, MessageSquare } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, ResponsiveContainer } from 'recharts';
-// import { Sidebar } from '../components/SideBar';
+import SideBar from '../components/SideBar';
+import Header from '../components/Header';
+import StatsCards from '../components/StatsCards';
+import MediaStats from "../components/MediaStats"
 const Dashboard = () => {
   const [activeItem, setActiveItem] = useState('Dashboard');
 
@@ -68,87 +71,17 @@ const Dashboard = () => {
   return (
     <div className="flex h-screen bg-gray-100">
       {/* Sidebar */}
-      <div className="w-64 bg-gray-800 text-white">
-        <div className="p-4">
-          <div className="flex items-center space-x-2">
-            <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
-              <span className="text-white font-bold">C</span>
-            </div>
-            <span className="text-xl font-semibold">CoreUI</span>
-          </div>
-        </div>
-        
-        <nav className="mt-8">
-          <div className="px-4 mb-2">
-            <span className="text-gray-400 text-xs uppercase tracking-wider">Navigation</span>
-          </div>
-          {sidebarItems.map((item, index) => (
-            <a
-              key={index}
-              href="#"
-              className={`flex items-center px-4 py-2 text-sm hover:bg-gray-700 ${
-                item.label === activeItem ? 'bg-blue-600 border-r-2 border-blue-400' : ''
-              }`}
-              onClick={() => setActiveItem(item.label)}
-            >
-              <item.icon className="w-4 h-4 mr-3" />
-              {item.label}
-            </a>
-          ))}
-        </nav>
-      </div>
+      <SideBar/>
 
       {/* Main Content */}
       <div className="flex-1 flex flex-col overflow-hidden">
         {/* Header */}
-        <header className="bg-white shadow-sm border-b border-gray-200">
-          <div className="flex items-center justify-between px-6 py-4">
-            <div className="flex items-center space-x-4">
-              <h1 className="text-xl font-semibold text-gray-800">Dashboard</h1>
-              <span className="text-gray-500">/</span>
-              <span className="text-gray-500">Dashboard</span>
-            </div>
-            <div className="flex items-center space-x-4">
-              <button className="p-2 text-gray-500 hover:text-gray-700">
-                <Search className="w-5 h-5" />
-              </button>
-              <button className="p-2 text-gray-500 hover:text-gray-700">
-                <Bell className="w-5 h-5" />
-              </button>
-              <button className="p-2 text-gray-500 hover:text-gray-700">
-                <MessageSquare className="w-5 h-5" />
-              </button>
-              <div className="w-8 h-8 bg-gray-300 rounded-full"></div>
-            </div>
-          </div>
-        </header>
+        <Header/>
 
         {/* Content */}
         <main className="flex-1 overflow-y-auto p-6">
           {/* Stats Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
-            {statsCards.map((card, index) => (
-              <div key={index} className={`${card.color} rounded-lg p-6 text-white`}>
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h3 className="text-2xl font-bold">{card.title}</h3>
-                    <p className="text-sm opacity-90">{card.description}</p>
-                  </div>
-                  <div className="flex items-center text-sm">
-                    {card.trend === 'up' ? (
-                      <TrendingUp className="w-4 h-4 mr-1" />
-                    ) : (
-                      <TrendingDown className="w-4 h-4 mr-1" />
-                    )}
-                    {card.subtitle}
-                  </div>
-                </div>
-                <div className="mt-4 bg-black bg-opacity-20 rounded h-1">
-                  <div className="bg-white bg-opacity-50 h-1 rounded" style={{ width: '70%' }}></div>
-                </div>
-              </div>
-            ))}
-          </div>
+          <StatsCards/>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Traffic Chart */}
@@ -230,31 +163,7 @@ const Dashboard = () => {
             </div>
 
             {/* Social Media Stats */}
-            <div className="space-y-4">
-              <div className="bg-blue-600 rounded-lg p-6 text-white flex items-center justify-between">
-                <Facebook className="w-8 h-8" />
-                <div className="text-right">
-                  <p className="text-2xl font-bold">89,400</p>
-                  <p className="text-sm opacity-90">friends</p>
-                </div>
-              </div>
-              
-              <div className="bg-sky-400 rounded-lg p-6 text-white flex items-center justify-between">
-                <Twitter className="w-8 h-8" />
-                <div className="text-right">
-                  <p className="text-2xl font-bold">973k</p>
-                  <p className="text-sm opacity-90">followers</p>
-                </div>
-              </div>
-              
-              <div className="bg-blue-700 rounded-lg p-6 text-white flex items-center justify-between">
-                <Linkedin className="w-8 h-8" />
-                <div className="text-right">
-                  <p className="text-2xl font-bold">500+</p>
-                  <p className="text-sm opacity-90">contacts</p>
-                </div>
-              </div>
-            </div>
+            <MediaStats/>
           </div>
         </main>
       </div>
