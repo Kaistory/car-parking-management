@@ -91,7 +91,7 @@ const getUser = async(req, res) =>{
 
 const  updateUser = async(req, res) =>{
     const userId = req.params.userId;
-    const {username, password, email} = req.body; // Data to update from the request body
+    const {username, password, email} = req.body;
     const updateData = {username, password, email};
     const user = await userModel.findById(userId);
     if(user.password != updateData.password){

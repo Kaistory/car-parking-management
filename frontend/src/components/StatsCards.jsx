@@ -6,28 +6,28 @@ const StatsCards = () => {
         {
           title: '26K',
           subtitle: '(-12.4%)',
-          description: 'Sessions',
+          description: 'Ô tô',
           color: 'bg-blue-500',
           trend: 'down'
         },
         {
           title: '56,200',
           subtitle: '(+12.4%)',
-          description: 'Pageviews',
+          description: 'Xe máy',
           color: 'bg-sky-400',
           trend: 'up'
         },
         {
           title: '2.10%',
           subtitle: '(+0.2%)',
-          description: 'Bounce Rate',
+          description: 'Xe đạp',
           color: 'bg-orange-400',
           trend: 'up'
         },
         {
           title: '54K',
           subtitle: '(+2.4%)',
-          description: 'Sessions Duration',
+          description: 'Tổng số các loại',
           color: 'bg-red-400',
           trend: 'up'
         }

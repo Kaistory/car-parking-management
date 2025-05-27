@@ -1,19 +1,22 @@
-import React from 'react';
-import { Routes, Route } from 'react-router-dom';
+import React, { useContext } from 'react';
+import {Routes, Route, Navigate} from "react-router-dom"
 import Login from './pages/Login';
+import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
-
+import { AuthContext } from "./context/AuthContext"
+import { DashBoardContextProvider } from './context/DashboardContext';
 function App() {
+  const {user} = useContext(AuthContext);
+  
   return (
-    <div className="app-container">
+      <DashBoardContextProvider user ={user}>
       <Routes>
-        <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/login" element={<Login />} />
-        {/* <Route path="/parking-records" element={<ParkingRecords />} />
-        <Route path="/resident-vehicles" element={<ResidentVehicles />} /> */}
-        {/* Thêm các route khác */}
+        <Route path = "/" element ={user ? <Dashboard />: <Login/>}/>
+        <Route path = "/register" element ={<Register/>}/>
+        <Route path = "/login" element ={user ? <Dashboard/>: <Login/>}/>
+        <Route path = "*" element ={<Navigate to="/"/>}/>
       </Routes>
-    </div>
+    </DashBoardContextProvider>
   );
 }
 

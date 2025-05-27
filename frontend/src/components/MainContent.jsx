@@ -1,6 +1,22 @@
+import SideBar from '../components/SideBar';
+import Header from '../components/Header';
+import StatsCards from '../components/StatsCards';
+import MediaStats from "../components/MediaStats";
+import TrafficChart from '../components/TrafficChart';
+
 const MainContent = () =>{
-    return (<>
-    </>
+return (<main className="flex-1 overflow-y-auto p-6">
+          {/* Stats Cards */}
+          <StatsCards/>
+
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {/* Traffic Chart */}
+            <TrafficChart/>
+
+            {/* Social Media Stats */}
+            <MediaStats/>
+          </div>
+        </main>
     );
 }
 
