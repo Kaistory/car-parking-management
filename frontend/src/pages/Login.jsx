@@ -1,4 +1,5 @@
 import {useState, useContext } from "react";
+import { useNavigate } from "react-router-dom";
 import Image from "../assets/image.png";
 import Logo from "../assets/logo.png";
 import GoogleSvg from "../assets/icons8-google.svg";
@@ -9,6 +10,7 @@ import { AuthContext } from "../context/AuthContext";
 
 
 const Login = () => {
+  const navigate = useNavigate();
   const [ showPassword, setShowPassword ] = useState(false);
   const { loginUser , loginError, loginInfo, updateLoginInfo, isLoginLoading } = useContext(AuthContext);
   
@@ -77,7 +79,10 @@ const Login = () => {
           </Col>
 
           <p className="login-bottom-p">
-            Don't have an account? <a href="#">Sign Up</a>
+            Don't have an account? <a href="#"onClick={e => {
+                    e.preventDefault();
+                    navigate("/register");
+                  }}>Sign Up</a>
           </p>
         </Col>
       </Col>
