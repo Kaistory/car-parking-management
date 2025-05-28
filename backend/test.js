@@ -22,7 +22,7 @@ client.on('error', function (error) {
 
 client.on('message', function (topic, message) {
     // called each time a message is received
-    if (topic === 'esp8266/dht11') {
+    if (topic === 'esp8266/data_rfid') {
     console.log('Received message dht11:', topic, message.toString());
   }
 
@@ -34,8 +34,8 @@ client.on('message', function (topic, message) {
 });
 
 // subscribe to topic 'my/test/topic'
-client.subscribe('esp8266/dht11');
+client.subscribe('esp8266/data_rfid');
 client.subscribe('my/test/topic');
 
-// publish message 'Hello' to topic 'my/test/topic'
-client.publish('my/test/topic', 'Hello');
+
+client.publish('esp8266/client', '{"message":"clos","amount":"120"}');

@@ -2,20 +2,87 @@ import React, { useState } from 'react';
 import { Edit, Trash2, Plus, X, Check } from 'lucide-react';
 
 const ParkingRecords = () => {
-  const [apartments, setApartments] = useState([
-    { id: 1, number: '201', building: 'C', status: 'Empty', area: 65, rentPrice: 8500000 },
-    { id: 2, number: '269', building: 'A', status: 'Owned', area: 75, rentPrice: 12000000 },
-    { id: 3, number: '333', building: 'D', status: 'Owned', area: 80, rentPrice: 15000000 },
-    { id: 4, number: '69', building: 'B', status: 'Owned', area: 55, rentPrice: 7500000 },
-    { id: 5, number: '255', building: 'B', status: 'Empty', area: 70, rentPrice: 9500000 },
-    { id: 6, number: '86', building: 'A', status: 'Empty', area: 60, rentPrice: 8000000 },
-    { id: 7, number: '179', building: 'A', status: 'Empty', area: 85, rentPrice: 11000000 },
-    { id: 8, number: '321', building: 'D', status: 'Owned', area: 90, rentPrice: 16000000 },
-    { id: 9, number: '203', building: 'B', status: 'Owned', area: 65, rentPrice: 9000000 },
-    { id: 10, number: '888', building: 'A', status: 'Owned', area: 100, rentPrice: 20000000 },
-    { id: 11, number: '170', building: 'C', status: 'Owned', area: 72, rentPrice: 10500000 },
-    { id: 12, number: '401', building: 'A', status: 'Empty', area: 58, rentPrice: 7800000 },
-    { id: 13, number: '444', building: 'D', status: 'Owned', area: 95, rentPrice: 18000000 }
+  const [parkingRecords, setParkingRecords] = useState([
+    { 
+      id: 1, 
+      vehicleId: '673a2b1c4f8e9d0012345678', 
+      vehicleModel: 'ResidentVehicle', 
+      entryTime: new Date('2024-05-28T08:30:00'), 
+      exitTime: null, 
+      status: 'IN' 
+    },
+    { 
+      id: 2, 
+      vehicleId: '673a2b1c4f8e9d0012345679', 
+      vehicleModel: 'VisitorVehicle', 
+      entryTime: new Date('2024-05-28T09:15:00'), 
+      exitTime: new Date('2024-05-28T11:45:00'), 
+      status: 'OUT' 
+    },
+    { 
+      id: 3, 
+      vehicleId: '673a2b1c4f8e9d001234567a', 
+      vehicleModel: 'ResidentVehicle', 
+      entryTime: new Date('2024-05-28T07:00:00'), 
+      exitTime: null, 
+      status: 'IN' 
+    },
+    { 
+      id: 4, 
+      vehicleId: '673a2b1c4f8e9d001234567b', 
+      vehicleModel: 'VisitorVehicle', 
+      entryTime: new Date('2024-05-28T10:20:00'), 
+      exitTime: new Date('2024-05-28T12:30:00'), 
+      status: 'OUT' 
+    },
+    { 
+      id: 5, 
+      vehicleId: '673a2b1c4f8e9d001234567c', 
+      vehicleModel: 'ResidentVehicle', 
+      entryTime: new Date('2024-05-28T06:45:00'), 
+      exitTime: null, 
+      status: 'IN' 
+    },
+    { 
+      id: 6, 
+      vehicleId: '673a2b1c4f8e9d001234567d', 
+      vehicleModel: 'VisitorVehicle', 
+      entryTime: new Date('2024-05-27T14:30:00'), 
+      exitTime: new Date('2024-05-27T16:20:00'), 
+      status: 'OUT' 
+    },
+    { 
+      id: 7, 
+      vehicleId: '673a2b1c4f8e9d001234567e', 
+      vehicleModel: 'ResidentVehicle', 
+      entryTime: new Date('2024-05-28T13:15:00'), 
+      exitTime: null, 
+      status: 'IN' 
+    },
+    { 
+      id: 8, 
+      vehicleId: '673a2b1c4f8e9d001234567f', 
+      vehicleModel: 'VisitorVehicle', 
+      entryTime: new Date('2024-05-28T11:00:00'), 
+      exitTime: new Date('2024-05-28T13:45:00'), 
+      status: 'OUT' 
+    },
+    { 
+      id: 9, 
+      vehicleId: '673a2b1c4f8e9d0012345680', 
+      vehicleModel: 'ResidentVehicle', 
+      entryTime: new Date('2024-05-28T05:30:00'), 
+      exitTime: null, 
+      status: 'IN' 
+    },
+    { 
+      id: 10, 
+      vehicleId: '673a2b1c4f8e9d0012345681', 
+      vehicleModel: 'VisitorVehicle', 
+      entryTime: new Date('2024-05-28T16:00:00'), 
+      exitTime: null, 
+      status: 'IN' 
+    }
   ]);
 
   const [entriesPerPage, setEntriesPerPage] = useState(10);
@@ -24,35 +91,67 @@ const ParkingRecords = () => {
   
   // Edit states
   const [editingId, setEditingId] = useState(null);
-  const [editForm, setEditForm] = useState({ number: '', building: '', status: '', area: '', rentPrice: '' });
+  const [editForm, setEditForm] = useState({ 
+    vehicleId: '', 
+    vehicleModel: 'ResidentVehicle', 
+    entryTime: '', 
+    exitTime: '', 
+    status: 'IN' 
+  });
   
   // Add states
   const [showAddModal, setShowAddModal] = useState(false);
-  const [addForm, setAddForm] = useState({ number: '', building: 'A', status: 'Empty', area: '', rentPrice: '' });
+  const [addForm, setAddForm] = useState({ 
+    vehicleId: '', 
+    vehicleModel: 'ResidentVehicle', 
+    entryTime: '', 
+    exitTime: '', 
+    status: 'IN' 
+  });
 
-  // Helper function to format currency
-  const formatCurrency = (amount) => {
-    return new Intl.NumberFormat('vi-VN', {
-      style: 'currency',
-      currency: 'VND'
-    }).format(amount);
+  // Helper function to format date and time
+  const formatDateTime = (date) => {
+    if (!date) return '-';
+    return new Date(date).toLocaleString('vi-VN', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit'
+    });
   };
 
-  // Filter apartments based on search term
-  const filteredApartments = apartments.filter(apt =>
-    apt.number.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    apt.building.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    apt.status.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    apt.area.toString().includes(searchTerm.toLowerCase()) ||
-    apt.rentPrice.toString().includes(searchTerm.toLowerCase())
+  // Helper function to calculate duration
+  const calculateDuration = (entryTime, exitTime) => {
+    if (!exitTime) return 'Still parked';
+    const duration = new Date(exitTime) - new Date(entryTime);
+    const hours = Math.floor(duration / (1000 * 60 * 60));
+    const minutes = Math.floor((duration % (1000 * 60 * 60)) / (1000 * 60));
+    return `${hours}h ${minutes}m`;
+  };
+
+  // Filter parking records based on search term
+  const filteredRecords = parkingRecords.filter(record =>
+    record.vehicleId.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    record.vehicleModel.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    record.status.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    formatDateTime(record.entryTime).toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (record.exitTime && formatDateTime(record.exitTime).toLowerCase().includes(searchTerm.toLowerCase()))
   );
 
-  // Sort apartments
-  const sortedApartments = [...filteredApartments].sort((a, b) => {
+  // Sort parking records
+  const sortedRecords = [...filteredRecords].sort((a, b) => {
     if (!sortConfig.key) return 0;
     
-    const aValue = a[sortConfig.key];
-    const bValue = b[sortConfig.key];
+    let aValue = a[sortConfig.key];
+    let bValue = b[sortConfig.key];
+    
+    // Handle date sorting
+    if (sortConfig.key === 'entryTime' || sortConfig.key === 'exitTime') {
+      aValue = aValue ? new Date(aValue) : new Date(0);
+      bValue = bValue ? new Date(bValue) : new Date(0);
+    }
     
     if (sortConfig.direction === 'asc') {
       return aValue < bValue ? -1 : aValue > bValue ? 1 : 0;
@@ -76,45 +175,51 @@ const ParkingRecords = () => {
   };
 
   // Edit functions
-  const handleEdit = (apartment) => {
-    setEditingId(apartment.id);
+  const handleEdit = (record) => {
+    setEditingId(record.id);
     setEditForm({
-      number: apartment.number,
-      building: apartment.building,
-      status: apartment.status,
-      area: apartment.area.toString(),
-      rentPrice: apartment.rentPrice.toString()
+      vehicleId: record.vehicleId,
+      vehicleModel: record.vehicleModel,
+      entryTime: record.entryTime ? new Date(record.entryTime).toISOString().slice(0, 16) : '',
+      exitTime: record.exitTime ? new Date(record.exitTime).toISOString().slice(0, 16) : '',
+      status: record.status
     });
   };
 
   const handleSaveEdit = () => {
     // Validation
-    if (!editForm.area || isNaN(editForm.area) || parseFloat(editForm.area) <= 0) {
-      alert('Please enter a valid area (square meters)');
+    if (!editForm.vehicleId.trim()) {
+      alert('Please enter a valid Vehicle ID');
       return;
     }
-    if (!editForm.rentPrice || isNaN(editForm.rentPrice) || parseFloat(editForm.rentPrice) <= 0) {
-      alert('Please enter a valid rent price');
+    if (!editForm.entryTime) {
+      alert('Please enter entry time');
+      return;
+    }
+    if (editForm.exitTime && new Date(editForm.exitTime) <= new Date(editForm.entryTime)) {
+      alert('Exit time must be after entry time');
       return;
     }
 
-    setApartments(prev => prev.map(apt => 
-      apt.id === editingId 
+    setParkingRecords(prev => prev.map(record => 
+      record.id === editingId 
         ? { 
-            ...apt, 
-            ...editForm,
-            area: parseFloat(editForm.area),
-            rentPrice: parseFloat(editForm.rentPrice)
+            ...record, 
+            vehicleId: editForm.vehicleId.trim(),
+            vehicleModel: editForm.vehicleModel,
+            entryTime: new Date(editForm.entryTime),
+            exitTime: editForm.exitTime ? new Date(editForm.exitTime) : null,
+            status: editForm.status
           }
-        : apt
+        : record
     ));
     setEditingId(null);
-    setEditForm({ number: '', building: '', status: '', area: '', rentPrice: '' });
+    setEditForm({ vehicleId: '', vehicleModel: 'ResidentVehicle', entryTime: '', exitTime: '', status: 'IN' });
   };
 
   const handleCancelEdit = () => {
     setEditingId(null);
-    setEditForm({ number: '', building: '', status: '', area: '', rentPrice: '' });
+    setEditForm({ vehicleId: '', vehicleModel: 'ResidentVehicle', entryTime: '', exitTime: '', status: 'IN' });
   };
 
   const handleInputChange = (field, value) => {
@@ -127,7 +232,14 @@ const ParkingRecords = () => {
   // Add functions
   const openAddModal = () => {
     setShowAddModal(true);
-    setAddForm({ number: '', building: 'A', status: 'Empty', area: '', rentPrice: '' });
+    const now = new Date().toISOString().slice(0, 16);
+    setAddForm({ 
+      vehicleId: '', 
+      vehicleModel: 'ResidentVehicle', 
+      entryTime: now, 
+      exitTime: '', 
+      status: 'IN' 
+    });
   };
 
   const handleAddInputChange = (field, value) => {
@@ -137,61 +249,52 @@ const ParkingRecords = () => {
     }));
   };
 
-  const handleSaveNewApartment = () => {
+  const handleSaveNewRecord = () => {
     // Validation
-    if (!addForm.number.trim()) {
-      alert('Please enter apartment number');
+    if (!addForm.vehicleId.trim()) {
+      alert('Please enter Vehicle ID');
+      return;
+    }
+    if (!addForm.entryTime) {
+      alert('Please enter entry time');
+      return;
+    }
+    if (addForm.exitTime && new Date(addForm.exitTime) <= new Date(addForm.entryTime)) {
+      alert('Exit time must be after entry time');
       return;
     }
 
-    if (!addForm.area || isNaN(addForm.area) || parseFloat(addForm.area) <= 0) {
-      alert('Please enter a valid area (square meters)');
-      return;
-    }
-
-    if (!addForm.rentPrice || isNaN(addForm.rentPrice) || parseFloat(addForm.rentPrice) <= 0) {
-      alert('Please enter a valid rent price');
-      return;
-    }
-
-    // Check if apartment number already exists
-    const exists = apartments.some(apt => apt.number.toLowerCase() === addForm.number.trim().toLowerCase());
-    if (exists) {
-      alert('Apartment number already exists');
-      return;
-    }
-
-    // Create new apartment
-    const newId = apartments.length > 0 ? Math.max(...apartments.map(apt => apt.id)) + 1 : 1;
-    const newApartment = {
+    // Create new parking record
+    const newId = parkingRecords.length > 0 ? Math.max(...parkingRecords.map(record => record.id)) + 1 : 1;
+    const newRecord = {
       id: newId,
-      number: addForm.number.trim(),
-      building: addForm.building,
-      status: addForm.status,
-      area: parseFloat(addForm.area),
-      rentPrice: parseFloat(addForm.rentPrice)
+      vehicleId: addForm.vehicleId.trim(),
+      vehicleModel: addForm.vehicleModel,
+      entryTime: new Date(addForm.entryTime),
+      exitTime: addForm.exitTime ? new Date(addForm.exitTime) : null,
+      status: addForm.status
     };
 
-    // Add to apartments list
-    setApartments(prev => [...prev, newApartment]);
+    // Add to parking records list
+    setParkingRecords(prev => [...prev, newRecord]);
     
     // Close modal and reset form
     setShowAddModal(false);
-    setAddForm({ number: '', building: 'A', status: 'Empty', area: '', rentPrice: '' });
+    setAddForm({ vehicleId: '', vehicleModel: 'ResidentVehicle', entryTime: '', exitTime: '', status: 'IN' });
     
     // Show success message
-    alert('Apartment added successfully!');
+    alert('Parking record added successfully!');
   };
 
   const handleCancelAdd = () => {
     setShowAddModal(false);
-    setAddForm({ number: '', building: 'A', status: 'Empty', area: '', rentPrice: '' });
+    setAddForm({ vehicleId: '', vehicleModel: 'ResidentVehicle', entryTime: '', exitTime: '', status: 'IN' });
   };
 
   // Delete function
   const handleDelete = (id) => {
-    if (window.confirm('Are you sure you want to delete this apartment?')) {
-      setApartments(prev => prev.filter(apt => apt.id !== id));
+    if (window.confirm('Are you sure you want to delete this parking record?')) {
+      setParkingRecords(prev => prev.filter(record => record.id !== id));
     }
   };
 
@@ -205,7 +308,7 @@ const ParkingRecords = () => {
             className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md flex items-center gap-2 transition-colors"
           >
             <Plus size={16} />
-            Add Apartment Detail
+            Add Parking Record
           </button>
         </div>
 
@@ -248,39 +351,42 @@ const ParkingRecords = () => {
                 </th>
                 <th 
                   className="px-4 py-3 text-left text-sm font-medium text-gray-600 border-b border-gray-200 cursor-pointer hover:bg-gray-100"
-                  onClick={() => handleSort('number')}
+                  onClick={() => handleSort('vehicleId')}
                 >
                   <div className="flex items-center gap-1">
-                    Apartment Number
-                    <span className="text-xs">{getSortIcon('number')}</span>
+                    Vehicle ID
+                    <span className="text-xs">{getSortIcon('vehicleId')}</span>
                   </div>
                 </th>
                 <th 
                   className="px-4 py-3 text-left text-sm font-medium text-gray-600 border-b border-gray-200 cursor-pointer hover:bg-gray-100"
-                  onClick={() => handleSort('building')}
+                  onClick={() => handleSort('vehicleModel')}
                 >
                   <div className="flex items-center gap-1">
-                    Building
-                    <span className="text-xs">{getSortIcon('building')}</span>
+                    Vehicle Model
+                    <span className="text-xs">{getSortIcon('vehicleModel')}</span>
                   </div>
                 </th>
                 <th 
                   className="px-4 py-3 text-left text-sm font-medium text-gray-600 border-b border-gray-200 cursor-pointer hover:bg-gray-100"
-                  onClick={() => handleSort('area')}
+                  onClick={() => handleSort('entryTime')}
                 >
                   <div className="flex items-center gap-1">
-                    Area (m²)
-                    <span className="text-xs">{getSortIcon('area')}</span>
+                    Entry Time
+                    <span className="text-xs">{getSortIcon('entryTime')}</span>
                   </div>
                 </th>
                 <th 
                   className="px-4 py-3 text-left text-sm font-medium text-gray-600 border-b border-gray-200 cursor-pointer hover:bg-gray-100"
-                  onClick={() => handleSort('rentPrice')}
+                  onClick={() => handleSort('exitTime')}
                 >
                   <div className="flex items-center gap-1">
-                    Rent Price
-                    <span className="text-xs">{getSortIcon('rentPrice')}</span>
+                    Exit Time
+                    <span className="text-xs">{getSortIcon('exitTime')}</span>
                   </div>
+                </th>
+                <th className="px-4 py-3 text-left text-sm font-medium text-gray-600 border-b border-gray-200">
+                  Duration
                 </th>
                 <th 
                   className="px-4 py-3 text-left text-sm font-medium text-gray-600 border-b border-gray-200 cursor-pointer hover:bg-gray-100"
@@ -297,92 +403,93 @@ const ParkingRecords = () => {
               </tr>
             </thead>
             <tbody>
-              {sortedApartments.slice(0, entriesPerPage).map((apartment, index) => (
-                <tr key={apartment.id} className="hover:bg-gray-50 border-b border-gray-100">
+              {sortedRecords.slice(0, entriesPerPage).map((record, index) => (
+                <tr key={record.id} className="hover:bg-gray-50 border-b border-gray-100">
                   <td className="px-4 py-3 text-sm text-gray-900">
                     {index + 1}
                   </td>
                   <td className="px-4 py-3 text-sm text-gray-900">
-                    {editingId === apartment.id ? (
+                    {editingId === record.id ? (
                       <input
                         type="text"
-                        value={editForm.number}
-                        onChange={(e) => handleInputChange('number', e.target.value)}
+                        value={editForm.vehicleId}
+                        onChange={(e) => handleInputChange('vehicleId', e.target.value)}
                         className="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                       />
                     ) : (
-                      apartment.number
+                      <span className="font-mono text-xs">{record.vehicleId}</span>
                     )}
                   </td>
                   <td className="px-4 py-3 text-sm text-gray-900">
-                    {editingId === apartment.id ? (
+                    {editingId === record.id ? (
                       <select
-                        value={editForm.building}
-                        onChange={(e) => handleInputChange('building', e.target.value)}
+                        value={editForm.vehicleModel}
+                        onChange={(e) => handleInputChange('vehicleModel', e.target.value)}
                         className="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                       >
-                        <option value="A">A</option>
-                        <option value="B">B</option>
-                        <option value="C">C</option>
-                        <option value="D">D</option>
+                        <option value="ResidentVehicle">ResidentVehicle</option>
+                        <option value="VisitorVehicle">VisitorVehicle</option>
                       </select>
                     ) : (
-                      apartment.building
+                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                        record.vehicleModel === 'ResidentVehicle' 
+                          ? 'bg-blue-100 text-blue-800' 
+                          : 'bg-purple-100 text-purple-800'
+                      }`}>
+                        {record.vehicleModel}
+                      </span>
                     )}
                   </td>
                   <td className="px-4 py-3 text-sm text-gray-900">
-                    {editingId === apartment.id ? (
+                    {editingId === record.id ? (
                       <input
-                        type="number"
-                        value={editForm.area}
-                        onChange={(e) => handleInputChange('area', e.target.value)}
+                        type="datetime-local"
+                        value={editForm.entryTime}
+                        onChange={(e) => handleInputChange('entryTime', e.target.value)}
                         className="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        placeholder="Area in m²"
-                        min="1"
-                        step="0.1"
                       />
                     ) : (
-                      `${apartment.area} m²`
+                      formatDateTime(record.entryTime)
                     )}
                   </td>
                   <td className="px-4 py-3 text-sm text-gray-900">
-                    {editingId === apartment.id ? (
+                    {editingId === record.id ? (
                       <input
-                        type="number"
-                        value={editForm.rentPrice}
-                        onChange={(e) => handleInputChange('rentPrice', e.target.value)}
+                        type="datetime-local"
+                        value={editForm.exitTime}
+                        onChange={(e) => handleInputChange('exitTime', e.target.value)}
                         className="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        placeholder="Rent price"
-                        min="0"
-                        step="100000"
                       />
                     ) : (
-                      formatCurrency(apartment.rentPrice)
+                      formatDateTime(record.exitTime)
                     )}
+                  </td>
+                  <td className="px-4 py-3 text-sm text-gray-900">
+                    {calculateDuration(record.entryTime, record.exitTime)}
                   </td>
                   <td className="px-4 py-3 text-sm">
-                    {editingId === apartment.id ? (
+                    {editingId === record.id ? (
                       <select
                         value={editForm.status}
                         onChange={(e) => handleInputChange('status', e.target.value)}
                         className="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                       >
-                        <option value="Empty">Empty</option>
-                        <option value="Owned">Owned</option>
+                        <option value="IN">IN</option>
+                        <option value="OUT">OUT</option>
                       </select>
                     ) : (
                       <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                        apartment.status === 'Empty' 
-                          ? 'bg-yellow-100 text-yellow-800' 
-                          : 'bg-green-100 text-green-800'
+                        record.status === 'IN' 
+                          ? 'bg-green-100 text-green-800' 
+                          : 'bg-red-100 text-red-800'
                       }`}>
-                        {apartment.status}
+                        {record.status}
                       </span>
                     )}
                   </td>
                   <td className="px-4 py-3 text-sm">
                     <div className="flex items-center gap-2">
-                      {editingId === apartment.id ? (
+                      {editingId === record.id ? (
                         <>
                           <button
                             onClick={handleSaveEdit}
@@ -402,14 +509,14 @@ const ParkingRecords = () => {
                       ) : (
                         <>
                           <button
-                            onClick={() => handleEdit(apartment)}
+                            onClick={() => handleEdit(record)}
                             className="p-1 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded transition-colors"
                             title="Edit"
                           >
                             <Edit size={16} />
                           </button>
                           <button
-                            onClick={() => handleDelete(apartment.id)}
+                            onClick={() => handleDelete(record.id)}
                             className="p-1 text-red-600 hover:text-red-800 hover:bg-red-50 rounded transition-colors"
                             title="Delete"
                           >
@@ -427,19 +534,19 @@ const ParkingRecords = () => {
 
         {/* Footer */}
         <div className="p-4 text-sm text-gray-600 border-t border-gray-200">
-          Showing {Math.min(entriesPerPage, filteredApartments.length)} of {filteredApartments.length} entries
-          {searchTerm && ` (filtered from ${apartments.length} total entries)`}
+          Showing {Math.min(entriesPerPage, filteredRecords.length)} of {filteredRecords.length} entries
+          {searchTerm && ` (filtered from ${parkingRecords.length} total entries)`}
         </div>
       </div>
 
-      {/* Add Apartment Modal */}
+      {/* Add Parking Record Modal */}
       {showAddModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-lg shadow-xl w-full max-w-md">
             <div className="p-6">
               {/* Modal Header */}
               <div className="flex justify-between items-center mb-6">
-                <h2 className="text-xl font-semibold text-gray-900">Add New Apartment</h2>
+                <h2 className="text-xl font-semibold text-gray-900">Add New Parking Record</h2>
                 <button
                   onClick={handleCancelAdd}
                   className="text-gray-400 hover:text-gray-600 transition-colors p-1"
@@ -452,61 +559,54 @@ const ParkingRecords = () => {
               <div className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Apartment Number <span className="text-red-500">*</span>
+                    Vehicle ID <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="text"
-                    value={addForm.number}
-                    onChange={(e) => handleAddInputChange('number', e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    placeholder="Enter apartment number (e.g., 101, 202)"
+                    value={addForm.vehicleId}
+                    onChange={(e) => handleAddInputChange('vehicleId', e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent font-mono text-sm"
+                    placeholder="Enter vehicle ID (e.g., 673a2b1c4f8e9d0012345678)"
                   />
                 </div>
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Building
+                    Vehicle Model
                   </label>
                   <select
-                    value={addForm.building}
-                    onChange={(e) => handleAddInputChange('building', e.target.value)}
+                    value={addForm.vehicleModel}
+                    onChange={(e) => handleAddInputChange('vehicleModel', e.target.value)}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   >
-                    <option value="A">Building A</option>
-                    <option value="B">Building B</option>
-                    <option value="C">Building C</option>
-                    <option value="D">Building D</option>
+                    <option value="ResidentVehicle">ResidentVehicle</option>
+                    <option value="VisitorVehicle">VisitorVehicle</option>
                   </select>
                 </div>
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Area (m²) <span className="text-red-500">*</span>
+                    Entry Time <span className="text-red-500">*</span>
                   </label>
                   <input
-                    type="number"
-                    value={addForm.area}
-                    onChange={(e) => handleAddInputChange('area', e.target.value)}
+                    type="datetime-local"
+                    value={addForm.entryTime}
+                    onChange={(e) => handleAddInputChange('entryTime', e.target.value)}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    placeholder="Enter area in square meters"
-                    min="1"
-                    step="0.1"
                   />
                 </div>
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Rent Price (VND) <span className="text-red-500">*</span>
+                    Exit Time
                   </label>
                   <input
-                    type="number"
-                    value={addForm.rentPrice}
-                    onChange={(e) => handleAddInputChange('rentPrice', e.target.value)}
+                    type="datetime-local"
+                    value={addForm.exitTime}
+                    onChange={(e) => handleAddInputChange('exitTime', e.target.value)}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    placeholder="Enter rent price in VND"
-                    min="0"
-                    step="100000"
                   />
+                  <p className="text-xs text-gray-500 mt-1">Leave empty if vehicle is still parked</p>
                 </div>
 
                 <div>
@@ -518,8 +618,8 @@ const ParkingRecords = () => {
                     onChange={(e) => handleAddInputChange('status', e.target.value)}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   >
-                    <option value="Empty">Empty</option>
-                    <option value="Owned">Owned</option>
+                    <option value="IN">IN</option>
+                    <option value="OUT">OUT</option>
                   </select>
                 </div>
               </div>
@@ -527,11 +627,11 @@ const ParkingRecords = () => {
               {/* Modal Actions */}
               <div className="flex gap-3 mt-6">
                 <button
-                  onClick={handleSaveNewApartment}
+                  onClick={handleSaveNewRecord}
                   className="mt-4 flex-1 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md transition-colors flex items-center justify-center gap-2 font-medium"
                 >
                   <Check size={16} />
-                  Add Apartment
+                  Add Record
                 </button>
                 <button
                   onClick={handleCancelAdd}

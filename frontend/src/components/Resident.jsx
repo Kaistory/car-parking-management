@@ -3,19 +3,19 @@ import { Edit, Trash2, Plus, X, Check } from 'lucide-react';
 
 const Resident = () => {
   const [apartments, setApartments] = useState([
-    { id: 1, number: '201', building: 'C', status: 'Empty' },
-    { id: 2, number: '269', building: 'A', status: 'Owned' },
-    { id: 3, number: '333', building: 'D', status: 'Owned' },
-    { id: 4, number: '69', building: 'B', status: 'Owned' },
-    { id: 5, number: '255', building: 'B', status: 'Empty' },
-    { id: 6, number: '86', building: 'A', status: 'Empty' },
-    { id: 7, number: '179', building: 'A', status: 'Empty' },
-    { id: 8, number: '321', building: 'D', status: 'Owned' },
-    { id: 9, number: '203', building: 'B', status: 'Owned' },
-    { id: 10, number: '888', building: 'A', status: 'Owned' },
-    { id: 11, number: '170', building: 'C', status: 'Owned' },
-    { id: 12, number: '401', building: 'A', status: 'Empty' },
-    { id: 13, number: '444', building: 'D', status: 'Owned' }
+    { id: 1, ownerName: 'Nguyễn Văn An', apartmentNumber: '201', floor: 2, area: 75 },
+    { id: 2, ownerName: 'Trần Thị Bình', apartmentNumber: '269', floor: 2, area: 68 },
+    { id: 3, ownerName: 'Lê Minh Cường', apartmentNumber: '333', floor: 3, area: 85 },
+    { id: 4, ownerName: 'Phạm Thị Dung', apartmentNumber: '69', floor: 6, area: 72 },
+    { id: 5, ownerName: '', apartmentNumber: '255', floor: 2, area: 65 },
+    { id: 6, ownerName: '', apartmentNumber: '86', floor: 8, area: 90 },
+    { id: 7, ownerName: '', apartmentNumber: '179', floor: 1, area: 58 },
+    { id: 8, ownerName: 'Hoàng Văn Em', apartmentNumber: '321', floor: 3, area: 78 },
+    { id: 9, ownerName: 'Võ Thị Phương', apartmentNumber: '203', floor: 2, area: 82 },
+    { id: 10, ownerName: 'Đặng Minh Giang', apartmentNumber: '888', floor: 8, area: 95 },
+    { id: 11, ownerName: 'Bùi Thị Hương', apartmentNumber: '170', floor: 1, area: 55 },
+    { id: 12, ownerName: '', apartmentNumber: '401', floor: 4, area: 88 },
+    { id: 13, ownerName: 'Ngô Văn Hùng', apartmentNumber: '444', floor: 4, area: 70 }
   ]);
 
   const [entriesPerPage, setEntriesPerPage] = useState(10);
@@ -24,17 +24,18 @@ const Resident = () => {
   
   // Edit states
   const [editingId, setEditingId] = useState(null);
-  const [editForm, setEditForm] = useState({ number: '', building: '', status: '' });
+  const [editForm, setEditForm] = useState({ ownerName: '', apartmentNumber: '', floor: '', area: '' });
   
   // Add states
   const [showAddModal, setShowAddModal] = useState(false);
-  const [addForm, setAddForm] = useState({ number: '', building: 'A', status: 'Empty' });
+  const [addForm, setAddForm] = useState({ ownerName: '', apartmentNumber: '', floor: '', area: '' });
 
   // Filter apartments based on search term
   const filteredApartments = apartments.filter(apt =>
-    apt.number.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    apt.building.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    apt.status.toLowerCase().includes(searchTerm.toLowerCase())
+    apt.apartmentNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    apt.ownerName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    apt.floor.toString().includes(searchTerm) ||
+    apt.area.toString().includes(searchTerm)
   );
 
   // Sort apartments
@@ -69,25 +70,58 @@ const Resident = () => {
   const handleEdit = (apartment) => {
     setEditingId(apartment.id);
     setEditForm({
-      number: apartment.number,
-      building: apartment.building,
-      status: apartment.status
+      ownerName: apartment.ownerName,
+      apartmentNumber: apartment.apartmentNumber,
+      floor: apartment.floor.toString(),
+      area: apartment.area.toString()
     });
   };
 
   const handleSaveEdit = () => {
+    // Validation
+    if (!editForm.apartmentNumber.trim()) {
+      alert('Vui lòng nhập số căn hộ');
+      return;
+    }
+    
+    if (!editForm.floor || isNaN(editForm.floor) || parseInt(editForm.floor) <= 0) {
+      alert('Vui lòng nhập tầng hợp lệ');
+      return;
+    }
+    
+    if (!editForm.area || isNaN(editForm.area) || parseInt(editForm.area) <= 0) {
+      alert('Vui lòng nhập diện tích hợp lệ');
+      return;
+    }
+
+    // Check if apartment number already exists (excluding current apartment)
+    const exists = apartments.some(apt => 
+      apt.id !== editingId && 
+      apt.apartmentNumber.toLowerCase() === editForm.apartmentNumber.trim().toLowerCase()
+    );
+    if (exists) {
+      alert('Số căn hộ đã tồn tại');
+      return;
+    }
+
     setApartments(prev => prev.map(apt => 
       apt.id === editingId 
-        ? { ...apt, ...editForm }
+        ? { 
+            ...apt, 
+            ownerName: editForm.ownerName.trim(),
+            apartmentNumber: editForm.apartmentNumber.trim(),
+            floor: parseInt(editForm.floor),
+            area: parseInt(editForm.area)
+          }
         : apt
     ));
     setEditingId(null);
-    setEditForm({ number: '', building: '', status: '' });
+    setEditForm({ ownerName: '', apartmentNumber: '', floor: '', area: '' });
   };
 
   const handleCancelEdit = () => {
     setEditingId(null);
-    setEditForm({ number: '', building: '', status: '' });
+    setEditForm({ ownerName: '', apartmentNumber: '', floor: '', area: '' });
   };
 
   const handleInputChange = (field, value) => {
@@ -100,7 +134,7 @@ const Resident = () => {
   // Add functions
   const openAddModal = () => {
     setShowAddModal(true);
-    setAddForm({ number: '', building: 'A', status: 'Empty' });
+    setAddForm({ ownerName: '', apartmentNumber: '', floor: '', area: '' });
   };
 
   const handleAddInputChange = (field, value) => {
@@ -112,15 +146,25 @@ const Resident = () => {
 
   const handleSaveNewApartment = () => {
     // Validation
-    if (!addForm.number.trim()) {
-      alert('Please enter apartment number');
+    if (!addForm.apartmentNumber.trim()) {
+      alert('Vui lòng nhập số căn hộ');
+      return;
+    }
+
+    if (!addForm.floor || isNaN(addForm.floor) || parseInt(addForm.floor) <= 0) {
+      alert('Vui lòng nhập tầng hợp lệ');
+      return;
+    }
+
+    if (!addForm.area || isNaN(addForm.area) || parseInt(addForm.area) <= 0) {
+      alert('Vui lòng nhập diện tích hợp lệ');
       return;
     }
 
     // Check if apartment number already exists
-    const exists = apartments.some(apt => apt.number.toLowerCase() === addForm.number.trim().toLowerCase());
+    const exists = apartments.some(apt => apt.apartmentNumber.toLowerCase() === addForm.apartmentNumber.trim().toLowerCase());
     if (exists) {
-      alert('Apartment number already exists');
+      alert('Số căn hộ đã tồn tại');
       return;
     }
 
@@ -128,9 +172,10 @@ const Resident = () => {
     const newId = apartments.length > 0 ? Math.max(...apartments.map(apt => apt.id)) + 1 : 1;
     const newApartment = {
       id: newId,
-      number: addForm.number.trim(),
-      building: addForm.building,
-      status: addForm.status
+      ownerName: addForm.ownerName.trim(),
+      apartmentNumber: addForm.apartmentNumber.trim(),
+      floor: parseInt(addForm.floor),
+      area: parseInt(addForm.area)
     };
 
     // Add to apartments list
@@ -138,20 +183,20 @@ const Resident = () => {
     
     // Close modal and reset form
     setShowAddModal(false);
-    setAddForm({ number: '', building: 'A', status: 'Empty' });
+    setAddForm({ ownerName: '', apartmentNumber: '', floor: '', area: '' });
     
     // Show success message
-    alert('Apartment added successfully!');
+    alert('Thêm căn hộ thành công!');
   };
 
   const handleCancelAdd = () => {
     setShowAddModal(false);
-    setAddForm({ number: '', building: 'A', status: 'Empty' });
+    setAddForm({ ownerName: '', apartmentNumber: '', floor: '', area: '' });
   };
 
   // Delete function
   const handleDelete = (id) => {
-    if (window.confirm('Are you sure you want to delete this apartment?')) {
+    if (window.confirm('Bạn có chắc chắn muốn xóa căn hộ này?')) {
       setApartments(prev => prev.filter(apt => apt.id !== id));
     }
   };
@@ -166,14 +211,14 @@ const Resident = () => {
             className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md flex items-center gap-2 transition-colors"
           >
             <Plus size={16} />
-            Add Apartment Detail
+            Thêm căn hộ
           </button>
         </div>
 
         {/* Controls */}
         <div className="p-4 border-b border-gray-200 flex justify-between items-center">
           <div className="flex items-center gap-2">
-            <span className="text-gray-600">Show</span>
+            <span className="text-gray-600">Hiển thị</span>
             <select 
               value={entriesPerPage}
               onChange={(e) => setEntriesPerPage(Number(e.target.value))}
@@ -184,17 +229,17 @@ const Resident = () => {
               <option value={50}>50</option>
               <option value={100}>100</option>
             </select>
-            <span className="text-gray-600">entries</span>
+            <span className="text-gray-600">mục</span>
           </div>
 
           <div className="flex items-center gap-2">
-            <span className="text-gray-600">Search:</span>
+            <span className="text-gray-600">Tìm kiếm:</span>
             <input
               type="text"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="border border-gray-300 rounded px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              placeholder=""
+              placeholder="Nhập từ khóa..."
             />
           </div>
         </div>
@@ -209,33 +254,42 @@ const Resident = () => {
                 </th>
                 <th 
                   className="px-4 py-3 text-left text-sm font-medium text-gray-600 border-b border-gray-200 cursor-pointer hover:bg-gray-100"
-                  onClick={() => handleSort('number')}
+                  onClick={() => handleSort('apartmentNumber')}
                 >
                   <div className="flex items-center gap-1">
-                    Apartment Number
-                    <span className="text-xs">{getSortIcon('number')}</span>
+                    Số căn hộ
+                    <span className="text-xs">{getSortIcon('apartmentNumber')}</span>
                   </div>
                 </th>
                 <th 
                   className="px-4 py-3 text-left text-sm font-medium text-gray-600 border-b border-gray-200 cursor-pointer hover:bg-gray-100"
-                  onClick={() => handleSort('building')}
+                  onClick={() => handleSort('ownerName')}
                 >
                   <div className="flex items-center gap-1">
-                    Building
-                    <span className="text-xs">{getSortIcon('building')}</span>
+                    Tên chủ sở hữu
+                    <span className="text-xs">{getSortIcon('ownerName')}</span>
                   </div>
                 </th>
                 <th 
                   className="px-4 py-3 text-left text-sm font-medium text-gray-600 border-b border-gray-200 cursor-pointer hover:bg-gray-100"
-                  onClick={() => handleSort('status')}
+                  onClick={() => handleSort('floor')}
                 >
                   <div className="flex items-center gap-1">
-                    Status
-                    <span className="text-xs">{getSortIcon('status')}</span>
+                    Tầng
+                    <span className="text-xs">{getSortIcon('floor')}</span>
+                  </div>
+                </th>
+                <th 
+                  className="px-4 py-3 text-left text-sm font-medium text-gray-600 border-b border-gray-200 cursor-pointer hover:bg-gray-100"
+                  onClick={() => handleSort('area')}
+                >
+                  <div className="flex items-center gap-1">
+                    Diện tích (m²)
+                    <span className="text-xs">{getSortIcon('area')}</span>
                   </div>
                 </th>
                 <th className="px-4 py-3 text-left text-sm font-medium text-gray-600 border-b border-gray-200">
-                  Actions
+                  Thao tác
                 </th>
               </tr>
             </thead>
@@ -249,48 +303,56 @@ const Resident = () => {
                     {editingId === apartment.id ? (
                       <input
                         type="text"
-                        value={editForm.number}
-                        onChange={(e) => handleInputChange('number', e.target.value)}
+                        value={editForm.apartmentNumber}
+                        onChange={(e) => handleInputChange('apartmentNumber', e.target.value)}
                         className="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        required
                       />
                     ) : (
-                      apartment.number
+                      apartment.apartmentNumber
                     )}
                   </td>
                   <td className="px-4 py-3 text-sm text-gray-900">
                     {editingId === apartment.id ? (
-                      <select
-                        value={editForm.building}
-                        onChange={(e) => handleInputChange('building', e.target.value)}
+                      <input
+                        type="text"
+                        value={editForm.ownerName}
+                        onChange={(e) => handleInputChange('ownerName', e.target.value)}
                         className="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      >
-                        <option value="A">A</option>
-                        <option value="B">B</option>
-                        <option value="C">C</option>
-                        <option value="D">D</option>
-                      </select>
+                        placeholder="Tên chủ sở hữu"
+                      />
                     ) : (
-                      apartment.building
+                      <span className={`${!apartment.ownerName ? 'text-gray-400 italic' : ''}`}>
+                        {apartment.ownerName || 'Chưa có chủ'}
+                      </span>
                     )}
                   </td>
-                  <td className="px-4 py-3 text-sm">
+                  <td className="px-4 py-3 text-sm text-gray-900">
                     {editingId === apartment.id ? (
-                      <select
-                        value={editForm.status}
-                        onChange={(e) => handleInputChange('status', e.target.value)}
+                      <input
+                        type="number"
+                        value={editForm.floor}
+                        onChange={(e) => handleInputChange('floor', e.target.value)}
                         className="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      >
-                        <option value="Empty">Empty</option>
-                        <option value="Owned">Owned</option>
-                      </select>
+                        min="1"
+                        required
+                      />
                     ) : (
-                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                        apartment.status === 'Empty' 
-                          ? 'bg-yellow-100 text-yellow-800' 
-                          : 'bg-green-100 text-green-800'
-                      }`}>
-                        {apartment.status}
-                      </span>
+                      apartment.floor
+                    )}
+                  </td>
+                  <td className="px-4 py-3 text-sm text-gray-900">
+                    {editingId === apartment.id ? (
+                      <input
+                        type="number"
+                        value={editForm.area}
+                        onChange={(e) => handleInputChange('area', e.target.value)}
+                        className="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        min="1"
+                        required
+                      />
+                    ) : (
+                      apartment.area
                     )}
                   </td>
                   <td className="px-4 py-3 text-sm">
@@ -300,14 +362,14 @@ const Resident = () => {
                           <button
                             onClick={handleSaveEdit}
                             className="p-1 text-green-600 hover:text-green-800 hover:bg-green-50 rounded transition-colors"
-                            title="Save"
+                            title="Lưu"
                           >
                             <Check size={16} />
                           </button>
                           <button
                             onClick={handleCancelEdit}
                             className="p-1 text-gray-600 hover:text-gray-800 hover:bg-gray-50 rounded transition-colors"
-                            title="Cancel"
+                            title="Hủy"
                           >
                             <X size={16} />
                           </button>
@@ -317,14 +379,14 @@ const Resident = () => {
                           <button
                             onClick={() => handleEdit(apartment)}
                             className="p-1 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded transition-colors"
-                            title="Edit"
+                            title="Sửa"
                           >
                             <Edit size={16} />
                           </button>
                           <button
                             onClick={() => handleDelete(apartment.id)}
                             className="p-1 text-red-600 hover:text-red-800 hover:bg-red-50 rounded transition-colors"
-                            title="Delete"
+                            title="Xóa"
                           >
                             <Trash2 size={16} />
                           </button>
@@ -340,8 +402,8 @@ const Resident = () => {
 
         {/* Footer */}
         <div className="p-4 text-sm text-gray-600 border-t border-gray-200">
-          Showing {Math.min(entriesPerPage, filteredApartments.length)} of {filteredApartments.length} entries
-          {searchTerm && ` (filtered from ${apartments.length} total entries)`}
+          Hiển thị {Math.min(entriesPerPage, filteredApartments.length)} trên {filteredApartments.length} mục
+          {searchTerm && ` (đã lọc từ ${apartments.length} tổng số mục)`}
         </div>
       </div>
 
@@ -352,7 +414,7 @@ const Resident = () => {
             <div className="p-6">
               {/* Modal Header */}
               <div className="flex justify-between items-center mb-6">
-                <h2 className="text-xl font-semibold text-gray-900">Add New Apartment</h2>
+                <h2 className="text-xl font-semibold text-gray-900">Thêm căn hộ mới</h2>
                 <button
                   onClick={handleCancelAdd}
                   className="text-gray-400 hover:text-gray-600 transition-colors p-1"
@@ -365,45 +427,59 @@ const Resident = () => {
               <div className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Apartment Number <span className="text-red-500">*</span>
+                    Số căn hộ <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="text"
-                    value={addForm.number}
-                    onChange={(e) => handleAddInputChange('number', e.target.value)}
+                    value={addForm.apartmentNumber}
+                    onChange={(e) => handleAddInputChange('apartmentNumber', e.target.value)}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    placeholder="Enter apartment number (e.g., 101, 202)"
+                    placeholder="Nhập số căn hộ (VD: 101, 202)"
+                    required
                   />
                 </div>
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Building
+                    Tên chủ sở hữu
                   </label>
-                  <select
-                    value={addForm.building}
-                    onChange={(e) => handleAddInputChange('building', e.target.value)}
+                  <input
+                    type="text"
+                    value={addForm.ownerName}
+                    onChange={(e) => handleAddInputChange('ownerName', e.target.value)}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  >
-                    <option value="A">Building A</option>
-                    <option value="B">Building B</option>
-                    <option value="C">Building C</option>
-                    <option value="D">Building D</option>
-                  </select>
+                    placeholder="Nhập tên chủ sở hữu"
+                  />
                 </div>
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Status
+                    Tầng <span className="text-red-500">*</span>
                   </label>
-                  <select
-                    value={addForm.status}
-                    onChange={(e) => handleAddInputChange('status', e.target.value)}
+                  <input
+                    type="number"
+                    value={addForm.floor}
+                    onChange={(e) => handleAddInputChange('floor', e.target.value)}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  >
-                    <option value="Empty">Empty</option>
-                    <option value="Owned">Owned</option>
-                  </select>
+                    placeholder="Nhập số tầng"
+                    min="1"
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Diện tích (m²) <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="number"
+                    value={addForm.area}
+                    onChange={(e) => handleAddInputChange('area', e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    placeholder="Nhập diện tích"
+                    min="1"
+                    required
+                  />
                 </div>
               </div>
 
@@ -411,17 +487,17 @@ const Resident = () => {
               <div className="flex gap-3 mt-6">
                 <button
                   onClick={handleSaveNewApartment}
-                  className="mt-4 flex-3 bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-md transition-colors flex items-center justify-center gap-2 font-medium"
+                  className="mt-4 flex-1 bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-md transition-colors flex items-center justify-center gap-2 font-medium"
                 >
                   <Check size={16} />
-                  <p>Add Apartment</p>
+                  Thêm căn hộ
                 </button>
                 <button
                   onClick={handleCancelAdd}
-                  className="mt-4 flex-3 bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-md transition-colors flex items-center justify-center gap-2 font-medium"
+                  className="mt-4 flex-1 bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-md transition-colors flex items-center justify-center gap-2 font-medium"
                 >
                   <X size={16} />
-                  Cancel
+                  Hủy
                 </button>
               </div>
             </div>

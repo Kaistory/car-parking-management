@@ -2,20 +2,81 @@ import React, { useState } from 'react';
 import { Edit, Trash2, Plus, X, Check } from 'lucide-react';
 
 const ParkingPayments = () => {
-  const [apartments, setApartments] = useState([
-    { id: 1, number: '201', building: 'C', status: 'Empty', rentPrice: 8500000 },
-    { id: 2, number: '269', building: 'A', status: 'Owned', rentPrice: 12000000 },
-    { id: 3, number: '333', building: 'D', status: 'Owned', rentPrice: 15000000 },
-    { id: 4, number: '69', building: 'B', status: 'Owned', rentPrice: 7500000 },
-    { id: 5, number: '255', building: 'B', status: 'Empty', rentPrice: 9500000 },
-    { id: 6, number: '86', building: 'A', status: 'Empty', rentPrice: 8000000 },
-    { id: 7, number: '179', building: 'A', status: 'Empty', rentPrice: 11000000 },
-    { id: 8, number: '321', building: 'D', status: 'Owned', rentPrice: 16000000 },
-    { id: 9, number: '203', building: 'B', status: 'Owned', rentPrice: 9000000 },
-    { id: 10, number: '888', building: 'A', status: 'Owned', rentPrice: 20000000 },
-    { id: 11, number: '170', building: 'C', status: 'Owned', rentPrice: 10500000 },
-    { id: 12, number: '401', building: 'A', status: 'Empty', rentPrice: 7800000 },
-    { id: 13, number: '444', building: 'D', status: 'Owned', rentPrice: 18000000 }
+  // Mock apartment data for reference
+  const apartmentsList = [
+    { id: '507f1f77bcf86cd799439011', number: '201', building: 'C' },
+    { id: '507f1f77bcf86cd799439012', number: '269', building: 'A' },
+    { id: '507f1f77bcf86cd799439013', number: '333', building: 'D' },
+    { id: '507f1f77bcf86cd799439014', number: '69', building: 'B' },
+    { id: '507f1f77bcf86cd799439015', number: '255', building: 'B' },
+    { id: '507f1f77bcf86cd799439016', number: '86', building: 'A' },
+    { id: '507f1f77bcf86cd799439017', number: '179', building: 'A' },
+    { id: '507f1f77bcf86cd799439018', number: '321', building: 'D' },
+    { id: '507f1f77bcf86cd799439019', number: '203', building: 'B' },
+    { id: '507f1f77bcf86cd79943901a', number: '888', building: 'A' },
+  ];
+
+  const [parkingPayments, setParkingPayments] = useState([
+    { 
+      id: 1, 
+      apartmentId: '507f1f77bcf86cd799439011', 
+      amountPaid: 500000, 
+      paymentDate: new Date('2024-01-15') 
+    },
+    { 
+      id: 2, 
+      apartmentId: '507f1f77bcf86cd799439012', 
+      amountPaid: 750000, 
+      paymentDate: new Date('2024-01-16') 
+    },
+    { 
+      id: 3, 
+      apartmentId: '507f1f77bcf86cd799439013', 
+      amountPaid: 600000, 
+      paymentDate: new Date('2024-01-18') 
+    },
+    { 
+      id: 4, 
+      apartmentId: '507f1f77bcf86cd799439014', 
+      amountPaid: 450000, 
+      paymentDate: new Date('2024-01-20') 
+    },
+    { 
+      id: 5, 
+      apartmentId: '507f1f77bcf86cd799439015', 
+      amountPaid: 800000, 
+      paymentDate: new Date('2024-01-22') 
+    },
+    { 
+      id: 6, 
+      apartmentId: '507f1f77bcf86cd799439016', 
+      amountPaid: 550000, 
+      paymentDate: new Date('2024-01-25') 
+    },
+    { 
+      id: 7, 
+      apartmentId: '507f1f77bcf86cd799439017', 
+      amountPaid: 700000, 
+      paymentDate: new Date('2024-01-28') 
+    },
+    { 
+      id: 8, 
+      apartmentId: '507f1f77bcf86cd799439018', 
+      amountPaid: 900000, 
+      paymentDate: new Date('2024-02-01') 
+    },
+    { 
+      id: 9, 
+      apartmentId: '507f1f77bcf86cd799439019', 
+      amountPaid: 650000, 
+      paymentDate: new Date('2024-02-03') 
+    },
+    { 
+      id: 10, 
+      apartmentId: '507f1f77bcf86cd79943901a', 
+      amountPaid: 1200000, 
+      paymentDate: new Date('2024-02-05') 
+    }
   ]);
 
   const [entriesPerPage, setEntriesPerPage] = useState(10);
@@ -24,11 +85,11 @@ const ParkingPayments = () => {
   
   // Edit states
   const [editingId, setEditingId] = useState(null);
-  const [editForm, setEditForm] = useState({ number: '', building: '', status: '', rentPrice: '' });
+  const [editForm, setEditForm] = useState({ apartmentId: '', amountPaid: '', paymentDate: '' });
   
   // Add states
   const [showAddModal, setShowAddModal] = useState(false);
-  const [addForm, setAddForm] = useState({ number: '', building: 'A', status: 'Empty', rentPrice: '' });
+  const [addForm, setAddForm] = useState({ apartmentId: '', amountPaid: '', paymentDate: '' });
 
   // Helper function to format currency
   const formatCurrency = (amount) => {
@@ -38,20 +99,50 @@ const ParkingPayments = () => {
     }).format(amount);
   };
 
-  // Filter apartments based on search term
-  const filteredApartments = apartments.filter(apt =>
-    apt.number.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    apt.building.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    apt.status.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    apt.rentPrice.toString().includes(searchTerm.toLowerCase())
-  );
+  // Helper function to format date
+  const formatDate = (date) => {
+    return new Intl.DateTimeFormat('vi-VN', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric'
+    }).format(date);
+  };
 
-  // Sort apartments
-  const sortedApartments = [...filteredApartments].sort((a, b) => {
+  // Helper function to get apartment info by ID
+  const getApartmentInfo = (apartmentId) => {
+    const apartment = apartmentsList.find(apt => apt.id === apartmentId);
+    return apartment ? `${apartment.number} (${apartment.building})` : 'Unknown';
+  };
+
+  // Filter payments based on search term
+  const filteredPayments = parkingPayments.filter(payment => {
+    const apartmentInfo = getApartmentInfo(payment.apartmentId).toLowerCase();
+    const amountStr = payment.amountPaid.toString();
+    const dateStr = formatDate(payment.paymentDate).toLowerCase();
+    
+    return apartmentInfo.includes(searchTerm.toLowerCase()) ||
+           amountStr.includes(searchTerm.toLowerCase()) ||
+           dateStr.includes(searchTerm.toLowerCase());
+  });
+
+  // Sort payments
+  const sortedPayments = [...filteredPayments].sort((a, b) => {
     if (!sortConfig.key) return 0;
     
-    const aValue = a[sortConfig.key];
-    const bValue = b[sortConfig.key];
+    let aValue = a[sortConfig.key];
+    let bValue = b[sortConfig.key];
+    
+    // Special handling for apartment sorting
+    if (sortConfig.key === 'apartmentId') {
+      aValue = getApartmentInfo(a.apartmentId);
+      bValue = getApartmentInfo(b.apartmentId);
+    }
+    
+    // Special handling for date sorting
+    if (sortConfig.key === 'paymentDate') {
+      aValue = new Date(a.paymentDate);
+      bValue = new Date(b.paymentDate);
+    }
     
     if (sortConfig.direction === 'asc') {
       return aValue < bValue ? -1 : aValue > bValue ? 1 : 0;
@@ -75,39 +166,49 @@ const ParkingPayments = () => {
   };
 
   // Edit functions
-  const handleEdit = (apartment) => {
-    setEditingId(apartment.id);
+  const handleEdit = (payment) => {
+    setEditingId(payment.id);
     setEditForm({
-      number: apartment.number,
-      building: apartment.building,
-      status: apartment.status,
-      rentPrice: apartment.rentPrice.toString()
+      apartmentId: payment.apartmentId,
+      amountPaid: payment.amountPaid.toString(),
+      paymentDate: payment.paymentDate.toISOString().split('T')[0]
     });
   };
 
   const handleSaveEdit = () => {
     // Validation
-    if (!editForm.rentPrice || isNaN(editForm.rentPrice) || parseFloat(editForm.rentPrice) <= 0) {
-      alert('Please enter a valid rent price');
+    if (!editForm.apartmentId) {
+      alert('Please select an apartment');
       return;
     }
 
-    setApartments(prev => prev.map(apt => 
-      apt.id === editingId 
+    if (!editForm.amountPaid || isNaN(editForm.amountPaid) || parseFloat(editForm.amountPaid) <= 0) {
+      alert('Please enter a valid payment amount');
+      return;
+    }
+
+    if (!editForm.paymentDate) {
+      alert('Please select a payment date');
+      return;
+    }
+
+    setParkingPayments(prev => prev.map(payment => 
+      payment.id === editingId 
         ? { 
-            ...apt, 
-            ...editForm,
-            rentPrice: parseFloat(editForm.rentPrice)
+            ...payment, 
+            apartmentId: editForm.apartmentId,
+            amountPaid: parseFloat(editForm.amountPaid),
+            paymentDate: new Date(editForm.paymentDate)
           }
-        : apt
+        : payment
     ));
     setEditingId(null);
-    setEditForm({ number: '', building: '', status: '', rentPrice: '' });
+    setEditForm({ apartmentId: '', amountPaid: '', paymentDate: '' });
   };
 
   const handleCancelEdit = () => {
     setEditingId(null);
-    setEditForm({ number: '', building: '', status: '', rentPrice: '' });
+    setEditForm({ apartmentId: '', amountPaid: '', paymentDate: '' });
   };
 
   const handleInputChange = (field, value) => {
@@ -120,7 +221,11 @@ const ParkingPayments = () => {
   // Add functions
   const openAddModal = () => {
     setShowAddModal(true);
-    setAddForm({ number: '', building: 'A', status: 'Empty', rentPrice: '' });
+    setAddForm({ 
+      apartmentId: apartmentsList[0]?.id || '', 
+      amountPaid: '', 
+      paymentDate: new Date().toISOString().split('T')[0]
+    });
   };
 
   const handleAddInputChange = (field, value) => {
@@ -130,55 +235,52 @@ const ParkingPayments = () => {
     }));
   };
 
-  const handleSaveNewApartment = () => {
+  const handleSaveNewPayment = () => {
     // Validation
-    if (!addForm.number.trim()) {
-      alert('Please enter apartment number');
+    if (!addForm.apartmentId) {
+      alert('Please select an apartment');
       return;
     }
 
-    if (!addForm.rentPrice || isNaN(addForm.rentPrice) || parseFloat(addForm.rentPrice) <= 0) {
-      alert('Please enter a valid rent price');
+    if (!addForm.amountPaid || isNaN(addForm.amountPaid) || parseFloat(addForm.amountPaid) <= 0) {
+      alert('Please enter a valid payment amount');
       return;
     }
 
-    // Check if apartment number already exists
-    const exists = apartments.some(apt => apt.number.toLowerCase() === addForm.number.trim().toLowerCase());
-    if (exists) {
-      alert('Apartment number already exists');
+    if (!addForm.paymentDate) {
+      alert('Please select a payment date');
       return;
     }
 
-    // Create new apartment
-    const newId = apartments.length > 0 ? Math.max(...apartments.map(apt => apt.id)) + 1 : 1;
-    const newApartment = {
+    // Create new payment
+    const newId = parkingPayments.length > 0 ? Math.max(...parkingPayments.map(payment => payment.id)) + 1 : 1;
+    const newPayment = {
       id: newId,
-      number: addForm.number.trim(),
-      building: addForm.building,
-      status: addForm.status,
-      rentPrice: parseFloat(addForm.rentPrice)
+      apartmentId: addForm.apartmentId,
+      amountPaid: parseFloat(addForm.amountPaid),
+      paymentDate: new Date(addForm.paymentDate)
     };
 
-    // Add to apartments list
-    setApartments(prev => [...prev, newApartment]);
+    // Add to payments list
+    setParkingPayments(prev => [...prev, newPayment]);
     
     // Close modal and reset form
     setShowAddModal(false);
-    setAddForm({ number: '', building: 'A', status: 'Empty', rentPrice: '' });
+    setAddForm({ apartmentId: '', amountPaid: '', paymentDate: '' });
     
     // Show success message
-    alert('Apartment added successfully!');
+    alert('Payment record added successfully!');
   };
 
   const handleCancelAdd = () => {
     setShowAddModal(false);
-    setAddForm({ number: '', building: 'A', status: 'Empty', rentPrice: '' });
+    setAddForm({ apartmentId: '', amountPaid: '', paymentDate: '' });
   };
 
   // Delete function
   const handleDelete = (id) => {
-    if (window.confirm('Are you sure you want to delete this apartment?')) {
-      setApartments(prev => prev.filter(apt => apt.id !== id));
+    if (window.confirm('Are you sure you want to delete this payment record?')) {
+      setParkingPayments(prev => prev.filter(payment => payment.id !== id));
     }
   };
 
@@ -187,13 +289,15 @@ const ParkingPayments = () => {
       <div className="bg-white rounded-lg shadow-sm">
         {/* Header */}
         <div className="p-4 border-b border-gray-200">
-          <button 
-            onClick={openAddModal}
-            className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md flex items-center gap-2 transition-colors"
-          >
-            <Plus size={16} />
-            Add Apartment Detail
-          </button>
+          <div className="flex items-center justify-between">
+            <button 
+              onClick={openAddModal}
+              className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md flex items-center gap-2 transition-colors"
+            >
+              <Plus size={16} />
+              Add Payment Record
+            </button>
+          </div>
         </div>
 
         {/* Controls */}
@@ -220,7 +324,7 @@ const ParkingPayments = () => {
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="border border-gray-300 rounded px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              placeholder=""
+              placeholder="Search by apartment, amount, or date..."
             />
           </div>
         </div>
@@ -235,38 +339,29 @@ const ParkingPayments = () => {
                 </th>
                 <th 
                   className="px-4 py-3 text-left text-sm font-medium text-gray-600 border-b border-gray-200 cursor-pointer hover:bg-gray-100"
-                  onClick={() => handleSort('number')}
+                  onClick={() => handleSort('apartmentId')}
                 >
                   <div className="flex items-center gap-1">
-                    Apartment Number
-                    <span className="text-xs">{getSortIcon('number')}</span>
+                    Apartment
+                    <span className="text-xs">{getSortIcon('apartmentId')}</span>
                   </div>
                 </th>
                 <th 
                   className="px-4 py-3 text-left text-sm font-medium text-gray-600 border-b border-gray-200 cursor-pointer hover:bg-gray-100"
-                  onClick={() => handleSort('building')}
+                  onClick={() => handleSort('amountPaid')}
                 >
                   <div className="flex items-center gap-1">
-                    Building
-                    <span className="text-xs">{getSortIcon('building')}</span>
+                    Amount Paid
+                    <span className="text-xs">{getSortIcon('amountPaid')}</span>
                   </div>
                 </th>
                 <th 
                   className="px-4 py-3 text-left text-sm font-medium text-gray-600 border-b border-gray-200 cursor-pointer hover:bg-gray-100"
-                  onClick={() => handleSort('rentPrice')}
+                  onClick={() => handleSort('paymentDate')}
                 >
                   <div className="flex items-center gap-1">
-                    Rent Price
-                    <span className="text-xs">{getSortIcon('rentPrice')}</span>
-                  </div>
-                </th>
-                <th 
-                  className="px-4 py-3 text-left text-sm font-medium text-gray-600 border-b border-gray-200 cursor-pointer hover:bg-gray-100"
-                  onClick={() => handleSort('status')}
-                >
-                  <div className="flex items-center gap-1">
-                    Status
-                    <span className="text-xs">{getSortIcon('status')}</span>
+                    Payment Date
+                    <span className="text-xs">{getSortIcon('paymentDate')}</span>
                   </div>
                 </th>
                 <th className="px-4 py-3 text-left text-sm font-medium text-gray-600 border-b border-gray-200">
@@ -275,77 +370,58 @@ const ParkingPayments = () => {
               </tr>
             </thead>
             <tbody>
-              {sortedApartments.slice(0, entriesPerPage).map((apartment, index) => (
-                <tr key={apartment.id} className="hover:bg-gray-50 border-b border-gray-100">
+              {sortedPayments.slice(0, entriesPerPage).map((payment, index) => (
+                <tr key={payment.id} className="hover:bg-gray-50 border-b border-gray-100">
                   <td className="px-4 py-3 text-sm text-gray-900">
                     {index + 1}
                   </td>
                   <td className="px-4 py-3 text-sm text-gray-900">
-                    {editingId === apartment.id ? (
-                      <input
-                        type="text"
-                        value={editForm.number}
-                        onChange={(e) => handleInputChange('number', e.target.value)}
-                        className="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      />
-                    ) : (
-                      apartment.number
-                    )}
-                  </td>
-                  <td className="px-4 py-3 text-sm text-gray-900">
-                    {editingId === apartment.id ? (
+                    {editingId === payment.id ? (
                       <select
-                        value={editForm.building}
-                        onChange={(e) => handleInputChange('building', e.target.value)}
+                        value={editForm.apartmentId}
+                        onChange={(e) => handleInputChange('apartmentId', e.target.value)}
                         className="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                       >
-                        <option value="A">A</option>
-                        <option value="B">B</option>
-                        <option value="C">C</option>
-                        <option value="D">D</option>
+                        {apartmentsList.map(apt => (
+                          <option key={apt.id} value={apt.id}>
+                            {apt.number} ({apt.building})
+                          </option>
+                        ))}
                       </select>
                     ) : (
-                      apartment.building
+                      getApartmentInfo(payment.apartmentId)
                     )}
                   </td>
                   <td className="px-4 py-3 text-sm text-gray-900">
-                    {editingId === apartment.id ? (
+                    {editingId === payment.id ? (
                       <input
                         type="number"
-                        value={editForm.rentPrice}
-                        onChange={(e) => handleInputChange('rentPrice', e.target.value)}
+                        value={editForm.amountPaid}
+                        onChange={(e) => handleInputChange('amountPaid', e.target.value)}
                         className="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        placeholder="Rent price"
+                        placeholder="Amount paid"
                         min="0"
-                        step="100000"
+                        step="50000"
                       />
                     ) : (
-                      formatCurrency(apartment.rentPrice)
+                      formatCurrency(payment.amountPaid)
                     )}
                   </td>
-                  <td className="px-4 py-3 text-sm">
-                    {editingId === apartment.id ? (
-                      <select
-                        value={editForm.status}
-                        onChange={(e) => handleInputChange('status', e.target.value)}
+                  <td className="px-4 py-3 text-sm text-gray-900">
+                    {editingId === payment.id ? (
+                      <input
+                        type="date"
+                        value={editForm.paymentDate}
+                        onChange={(e) => handleInputChange('paymentDate', e.target.value)}
                         className="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      >
-                        <option value="Empty">Empty</option>
-                        <option value="Owned">Owned</option>
-                      </select>
+                      />
                     ) : (
-                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                        apartment.status === 'Empty' 
-                          ? 'bg-yellow-100 text-yellow-800' 
-                          : 'bg-green-100 text-green-800'
-                      }`}>
-                        {apartment.status}
-                      </span>
+                      formatDate(payment.paymentDate)
                     )}
                   </td>
                   <td className="px-4 py-3 text-sm">
                     <div className="flex items-center gap-2">
-                      {editingId === apartment.id ? (
+                      {editingId === payment.id ? (
                         <>
                           <button
                             onClick={handleSaveEdit}
@@ -365,14 +441,14 @@ const ParkingPayments = () => {
                       ) : (
                         <>
                           <button
-                            onClick={() => handleEdit(apartment)}
+                            onClick={() => handleEdit(payment)}
                             className="p-1 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded transition-colors"
                             title="Edit"
                           >
                             <Edit size={16} />
                           </button>
                           <button
-                            onClick={() => handleDelete(apartment.id)}
+                            onClick={() => handleDelete(payment.id)}
                             className="p-1 text-red-600 hover:text-red-800 hover:bg-red-50 rounded transition-colors"
                             title="Delete"
                           >
@@ -390,19 +466,19 @@ const ParkingPayments = () => {
 
         {/* Footer */}
         <div className="p-4 text-sm text-gray-600 border-t border-gray-200">
-          Showing {Math.min(entriesPerPage, filteredApartments.length)} of {filteredApartments.length} entries
-          {searchTerm && ` (filtered from ${apartments.length} total entries)`}
+          Showing {Math.min(entriesPerPage, filteredPayments.length)} of {filteredPayments.length} entries
+          {searchTerm && ` (filtered from ${parkingPayments.length} total entries)`}
         </div>
       </div>
 
-      {/* Add Apartment Modal */}
+      {/* Add Payment Modal */}
       {showAddModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-lg shadow-xl w-full max-w-md">
             <div className="p-6">
               {/* Modal Header */}
               <div className="flex justify-between items-center mb-6">
-                <h2 className="text-xl font-semibold text-gray-900">Add New Apartment</h2>
+                <h2 className="text-xl font-semibold text-gray-900">Add New Payment Record</h2>
                 <button
                   onClick={handleCancelAdd}
                   className="text-gray-400 hover:text-gray-600 transition-colors p-1"
@@ -415,76 +491,62 @@ const ParkingPayments = () => {
               <div className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Apartment Number <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    value={addForm.number}
-                    onChange={(e) => handleAddInputChange('number', e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    placeholder="Enter apartment number (e.g., 101, 202)"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Building
+                    Apartment <span className="text-red-500">*</span>
                   </label>
                   <select
-                    value={addForm.building}
-                    onChange={(e) => handleAddInputChange('building', e.target.value)}
+                    value={addForm.apartmentId}
+                    onChange={(e) => handleAddInputChange('apartmentId', e.target.value)}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   >
-                    <option value="A">Building A</option>
-                    <option value="B">Building B</option>
-                    <option value="C">Building C</option>
-                    <option value="D">Building D</option>
+                    {apartmentsList.map(apt => (
+                      <option key={apt.id} value={apt.id}>
+                        {apt.number} ({apt.building})
+                      </option>
+                    ))}
                   </select>
                 </div>
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Rent Price (VND) <span className="text-red-500">*</span>
+                    Amount Paid (VND) <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="number"
-                    value={addForm.rentPrice}
-                    onChange={(e) => handleAddInputChange('rentPrice', e.target.value)}
+                    value={addForm.amountPaid}
+                    onChange={(e) => handleAddInputChange('amountPaid', e.target.value)}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    placeholder="Enter rent price in VND"
+                    placeholder="Enter payment amount in VND"
                     min="0"
-                    step="100000"
+                    step="50000"
                   />
                 </div>
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Status
+                    Payment Date <span className="text-red-500">*</span>
                   </label>
-                  <select
-                    value={addForm.status}
-                    onChange={(e) => handleAddInputChange('status', e.target.value)}
+                  <input
+                    type="date"
+                    value={addForm.paymentDate}
+                    onChange={(e) => handleAddInputChange('paymentDate', e.target.value)}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  >
-                    <option value="Empty">Empty</option>
-                    <option value="Owned">Owned</option>
-                  </select>
+                  />
                 </div>
               </div>
 
               {/* Modal Actions */}
               <div className="flex gap-3 mt-6">
                 <button
-                  onClick={handleSaveNewApartment}
-                  className=" mt-4 flex-1 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md transition-colors flex items-center justify-center gap-2 font-medium"
+                  onClick={handleSaveNewPayment}
+                  className="flex-1 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md transition-colors flex items-center justify-center gap-2 font-medium"
                 >
                   <Check size={16} />
-                  Add Apartment
+                  Add Payment
                 </button>
             
                 <button
                   onClick={handleCancelAdd}
-                  className="mt-4 flex-1 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md transition-colors flex items-center justify-center gap-2 font-medium"
+                  className="flex-1 bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-md transition-colors flex items-center justify-center gap-2 font-medium"
                 >
                   <X size={16} />
                   Cancel

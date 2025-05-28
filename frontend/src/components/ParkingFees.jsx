@@ -1,21 +1,16 @@
 import React, { useState } from 'react';
 import { Edit, Trash2, Plus, X, Check } from 'lucide-react';
 
-const ParkingFrees = () => {
-  const [apartments, setApartments] = useState([
-    { id: 1, number: '201', building: 'C', status: 'Empty', rentPrice: 8500000 },
-    { id: 2, number: '269', building: 'A', status: 'Owned', rentPrice: 12000000 },
-    { id: 3, number: '333', building: 'D', status: 'Owned', rentPrice: 15000000 },
-    { id: 4, number: '69', building: 'B', status: 'Owned', rentPrice: 7500000 },
-    { id: 5, number: '255', building: 'B', status: 'Empty', rentPrice: 9500000 },
-    { id: 6, number: '86', building: 'A', status: 'Empty', rentPrice: 8000000 },
-    { id: 7, number: '179', building: 'A', status: 'Empty', rentPrice: 11000000 },
-    { id: 8, number: '321', building: 'D', status: 'Owned', rentPrice: 16000000 },
-    { id: 9, number: '203', building: 'B', status: 'Owned', rentPrice: 9000000 },
-    { id: 10, number: '888', building: 'A', status: 'Owned', rentPrice: 20000000 },
-    { id: 11, number: '170', building: 'C', status: 'Owned', rentPrice: 10500000 },
-    { id: 12, number: '401', building: 'A', status: 'Empty', rentPrice: 7800000 },
-    { id: 13, number: '444', building: 'D', status: 'Owned', rentPrice: 18000000 }
+const ParkingFees = () => {
+  const [parkingFees, setParkingFees] = useState([
+    { id: 1, vehicleType: 'Motorcycle', feeAmount: 50000, effectiveDate: new Date('2024-01-01') },
+    { id: 2, vehicleType: 'Car', feeAmount: 200000, effectiveDate: new Date('2024-01-01') },
+    { id: 3, vehicleType: 'Bicycle', feeAmount: 20000, effectiveDate: new Date('2024-02-01') },
+    { id: 4, vehicleType: 'Electric Scooter', feeAmount: 75000, effectiveDate: new Date('2024-01-15') },
+    { id: 5, vehicleType: 'Truck', feeAmount: 500000, effectiveDate: new Date('2024-03-01') },
+    { id: 6, vehicleType: 'Bus', feeAmount: 800000, effectiveDate: new Date('2024-02-15') },
+    { id: 7, vehicleType: 'Van', feeAmount: 300000, effectiveDate: new Date('2024-01-20') },
+    { id: 8, vehicleType: 'SUV', feeAmount: 250000, effectiveDate: new Date('2024-02-10') }
   ]);
 
   const [entriesPerPage, setEntriesPerPage] = useState(10);
@@ -24,11 +19,11 @@ const ParkingFrees = () => {
   
   // Edit states
   const [editingId, setEditingId] = useState(null);
-  const [editForm, setEditForm] = useState({ number: '', building: '', status: '', rentPrice: '' });
+  const [editForm, setEditForm] = useState({ vehicleType: '', feeAmount: '', effectiveDate: '' });
   
   // Add states
   const [showAddModal, setShowAddModal] = useState(false);
-  const [addForm, setAddForm] = useState({ number: '', building: 'A', status: 'Empty', rentPrice: '' });
+  const [addForm, setAddForm] = useState({ vehicleType: '', feeAmount: '', effectiveDate: '' });
 
   // Helper function to format currency
   const formatCurrency = (amount) => {
@@ -38,20 +33,35 @@ const ParkingFrees = () => {
     }).format(amount);
   };
 
-  // Filter apartments based on search term
-  const filteredApartments = apartments.filter(apt =>
-    apt.number.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    apt.building.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    apt.status.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    apt.rentPrice.toString().includes(searchTerm.toLowerCase())
+  // Helper function to format date
+  const formatDate = (date) => {
+    return new Date(date).toLocaleDateString('vi-VN');
+  };
+
+  // Helper function to format date for input
+  const formatDateForInput = (date) => {
+    return new Date(date).toISOString().split('T')[0];
+  };
+
+  // Filter parking fees based on search term
+  const filteredParkingFees = parkingFees.filter(fee =>
+    fee.vehicleType.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    fee.feeAmount.toString().includes(searchTerm.toLowerCase()) ||
+    formatDate(fee.effectiveDate).includes(searchTerm.toLowerCase())
   );
 
-  // Sort apartments
-  const sortedApartments = [...filteredApartments].sort((a, b) => {
+  // Sort parking fees
+  const sortedParkingFees = [...filteredParkingFees].sort((a, b) => {
     if (!sortConfig.key) return 0;
     
-    const aValue = a[sortConfig.key];
-    const bValue = b[sortConfig.key];
+    let aValue = a[sortConfig.key];
+    let bValue = b[sortConfig.key];
+    
+    // Handle date sorting
+    if (sortConfig.key === 'effectiveDate') {
+      aValue = new Date(aValue);
+      bValue = new Date(bValue);
+    }
     
     if (sortConfig.direction === 'asc') {
       return aValue < bValue ? -1 : aValue > bValue ? 1 : 0;
@@ -75,39 +85,49 @@ const ParkingFrees = () => {
   };
 
   // Edit functions
-  const handleEdit = (apartment) => {
-    setEditingId(apartment.id);
+  const handleEdit = (parkingFee) => {
+    setEditingId(parkingFee.id);
     setEditForm({
-      number: apartment.number,
-      building: apartment.building,
-      status: apartment.status,
-      rentPrice: apartment.rentPrice.toString()
+      vehicleType: parkingFee.vehicleType,
+      feeAmount: parkingFee.feeAmount.toString(),
+      effectiveDate: formatDateForInput(parkingFee.effectiveDate)
     });
   };
 
   const handleSaveEdit = () => {
     // Validation
-    if (!editForm.rentPrice || isNaN(editForm.rentPrice) || parseFloat(editForm.rentPrice) <= 0) {
-      alert('Please enter a valid rent price');
+    if (!editForm.vehicleType.trim()) {
+      alert('Please enter vehicle type');
       return;
     }
 
-    setApartments(prev => prev.map(apt => 
-      apt.id === editingId 
+    if (!editForm.feeAmount || isNaN(editForm.feeAmount) || parseFloat(editForm.feeAmount) <= 0) {
+      alert('Please enter a valid fee amount');
+      return;
+    }
+
+    if (!editForm.effectiveDate) {
+      alert('Please select effective date');
+      return;
+    }
+
+    setParkingFees(prev => prev.map(fee => 
+      fee.id === editingId 
         ? { 
-            ...apt, 
-            ...editForm,
-            rentPrice: parseFloat(editForm.rentPrice)
+            ...fee, 
+            vehicleType: editForm.vehicleType.trim(),
+            feeAmount: parseFloat(editForm.feeAmount),
+            effectiveDate: new Date(editForm.effectiveDate)
           }
-        : apt
+        : fee
     ));
     setEditingId(null);
-    setEditForm({ number: '', building: '', status: '', rentPrice: '' });
+    setEditForm({ vehicleType: '', feeAmount: '', effectiveDate: '' });
   };
 
   const handleCancelEdit = () => {
     setEditingId(null);
-    setEditForm({ number: '', building: '', status: '', rentPrice: '' });
+    setEditForm({ vehicleType: '', feeAmount: '', effectiveDate: '' });
   };
 
   const handleInputChange = (field, value) => {
@@ -120,7 +140,11 @@ const ParkingFrees = () => {
   // Add functions
   const openAddModal = () => {
     setShowAddModal(true);
-    setAddForm({ number: '', building: 'A', status: 'Empty', rentPrice: '' });
+    setAddForm({ 
+      vehicleType: '', 
+      feeAmount: '', 
+      effectiveDate: formatDateForInput(new Date()) 
+    });
   };
 
   const handleAddInputChange = (field, value) => {
@@ -130,55 +154,59 @@ const ParkingFrees = () => {
     }));
   };
 
-  const handleSaveNewApartment = () => {
+  const handleSaveNewParkingFee = () => {
     // Validation
-    if (!addForm.number.trim()) {
-      alert('Please enter apartment number');
+    if (!addForm.vehicleType.trim()) {
+      alert('Please enter vehicle type');
       return;
     }
 
-    if (!addForm.rentPrice || isNaN(addForm.rentPrice) || parseFloat(addForm.rentPrice) <= 0) {
-      alert('Please enter a valid rent price');
+    if (!addForm.feeAmount || isNaN(addForm.feeAmount) || parseFloat(addForm.feeAmount) <= 0) {
+      alert('Please enter a valid fee amount');
       return;
     }
 
-    // Check if apartment number already exists
-    const exists = apartments.some(apt => apt.number.toLowerCase() === addForm.number.trim().toLowerCase());
+    if (!addForm.effectiveDate) {
+      alert('Please select effective date');
+      return;
+    }
+
+    // Check if vehicle type already exists
+    const exists = parkingFees.some(fee => fee.vehicleType.toLowerCase() === addForm.vehicleType.trim().toLowerCase());
     if (exists) {
-      alert('Apartment number already exists');
+      alert('Vehicle type already exists');
       return;
     }
 
-    // Create new apartment
-    const newId = apartments.length > 0 ? Math.max(...apartments.map(apt => apt.id)) + 1 : 1;
-    const newApartment = {
+    // Create new parking fee
+    const newId = parkingFees.length > 0 ? Math.max(...parkingFees.map(fee => fee.id)) + 1 : 1;
+    const newParkingFee = {
       id: newId,
-      number: addForm.number.trim(),
-      building: addForm.building,
-      status: addForm.status,
-      rentPrice: parseFloat(addForm.rentPrice)
+      vehicleType: addForm.vehicleType.trim(),
+      feeAmount: parseFloat(addForm.feeAmount),
+      effectiveDate: new Date(addForm.effectiveDate)
     };
 
-    // Add to apartments list
-    setApartments(prev => [...prev, newApartment]);
+    // Add to parking fees list
+    setParkingFees(prev => [...prev, newParkingFee]);
     
     // Close modal and reset form
     setShowAddModal(false);
-    setAddForm({ number: '', building: 'A', status: 'Empty', rentPrice: '' });
+    setAddForm({ vehicleType: '', feeAmount: '', effectiveDate: '' });
     
     // Show success message
-    alert('Apartment added successfully!');
+    alert('Parking fee added successfully!');
   };
 
   const handleCancelAdd = () => {
     setShowAddModal(false);
-    setAddForm({ number: '', building: 'A', status: 'Empty', rentPrice: '' });
+    setAddForm({ vehicleType: '', feeAmount: '', effectiveDate: '' });
   };
 
   // Delete function
   const handleDelete = (id) => {
-    if (window.confirm('Are you sure you want to delete this apartment?')) {
-      setApartments(prev => prev.filter(apt => apt.id !== id));
+    if (window.confirm('Are you sure you want to delete this parking fee?')) {
+      setParkingFees(prev => prev.filter(fee => fee.id !== id));
     }
   };
 
@@ -187,12 +215,13 @@ const ParkingFrees = () => {
       <div className="bg-white rounded-lg shadow-sm">
         {/* Header */}
         <div className="p-4 border-b border-gray-200">
+          
           <button 
             onClick={openAddModal}
             className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md flex items-center gap-2 transition-colors"
           >
             <Plus size={16} />
-            Add Apartment Detail
+            Add Parking Fee
           </button>
         </div>
 
@@ -220,7 +249,7 @@ const ParkingFrees = () => {
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="border border-gray-300 rounded px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              placeholder=""
+              placeholder="Search vehicle type, amount, or date..."
             />
           </div>
         </div>
@@ -235,38 +264,29 @@ const ParkingFrees = () => {
                 </th>
                 <th 
                   className="px-4 py-3 text-left text-sm font-medium text-gray-600 border-b border-gray-200 cursor-pointer hover:bg-gray-100"
-                  onClick={() => handleSort('number')}
+                  onClick={() => handleSort('vehicleType')}
                 >
                   <div className="flex items-center gap-1">
-                    Apartment Number
-                    <span className="text-xs">{getSortIcon('number')}</span>
+                    Vehicle Type
+                    <span className="text-xs">{getSortIcon('vehicleType')}</span>
                   </div>
                 </th>
                 <th 
                   className="px-4 py-3 text-left text-sm font-medium text-gray-600 border-b border-gray-200 cursor-pointer hover:bg-gray-100"
-                  onClick={() => handleSort('building')}
+                  onClick={() => handleSort('feeAmount')}
                 >
                   <div className="flex items-center gap-1">
-                    Building
-                    <span className="text-xs">{getSortIcon('building')}</span>
+                    Fee Amount
+                    <span className="text-xs">{getSortIcon('feeAmount')}</span>
                   </div>
                 </th>
                 <th 
                   className="px-4 py-3 text-left text-sm font-medium text-gray-600 border-b border-gray-200 cursor-pointer hover:bg-gray-100"
-                  onClick={() => handleSort('rentPrice')}
+                  onClick={() => handleSort('effectiveDate')}
                 >
                   <div className="flex items-center gap-1">
-                    Rent Price
-                    <span className="text-xs">{getSortIcon('rentPrice')}</span>
-                  </div>
-                </th>
-                <th 
-                  className="px-4 py-3 text-left text-sm font-medium text-gray-600 border-b border-gray-200 cursor-pointer hover:bg-gray-100"
-                  onClick={() => handleSort('status')}
-                >
-                  <div className="flex items-center gap-1">
-                    Status
-                    <span className="text-xs">{getSortIcon('status')}</span>
+                    Effective Date
+                    <span className="text-xs">{getSortIcon('effectiveDate')}</span>
                   </div>
                 </th>
                 <th className="px-4 py-3 text-left text-sm font-medium text-gray-600 border-b border-gray-200">
@@ -275,77 +295,58 @@ const ParkingFrees = () => {
               </tr>
             </thead>
             <tbody>
-              {sortedApartments.slice(0, entriesPerPage).map((apartment, index) => (
-                <tr key={apartment.id} className="hover:bg-gray-50 border-b border-gray-100">
+              {sortedParkingFees.slice(0, entriesPerPage).map((parkingFee, index) => (
+                <tr key={parkingFee.id} className="hover:bg-gray-50 border-b border-gray-100">
                   <td className="px-4 py-3 text-sm text-gray-900">
                     {index + 1}
                   </td>
                   <td className="px-4 py-3 text-sm text-gray-900">
-                    {editingId === apartment.id ? (
+                    {editingId === parkingFee.id ? (
                       <input
                         type="text"
-                        value={editForm.number}
-                        onChange={(e) => handleInputChange('number', e.target.value)}
+                        value={editForm.vehicleType}
+                        onChange={(e) => handleInputChange('vehicleType', e.target.value)}
                         className="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        placeholder="Vehicle type"
                       />
                     ) : (
-                      apartment.number
+                      <span className="font-medium">{parkingFee.vehicleType}</span>
                     )}
                   </td>
                   <td className="px-4 py-3 text-sm text-gray-900">
-                    {editingId === apartment.id ? (
-                      <select
-                        value={editForm.building}
-                        onChange={(e) => handleInputChange('building', e.target.value)}
-                        className="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      >
-                        <option value="A">A</option>
-                        <option value="B">B</option>
-                        <option value="C">C</option>
-                        <option value="D">D</option>
-                      </select>
-                    ) : (
-                      apartment.building
-                    )}
-                  </td>
-                  <td className="px-4 py-3 text-sm text-gray-900">
-                    {editingId === apartment.id ? (
+                    {editingId === parkingFee.id ? (
                       <input
                         type="number"
-                        value={editForm.rentPrice}
-                        onChange={(e) => handleInputChange('rentPrice', e.target.value)}
+                        value={editForm.feeAmount}
+                        onChange={(e) => handleInputChange('feeAmount', e.target.value)}
                         className="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        placeholder="Rent price"
+                        placeholder="Fee amount"
                         min="0"
-                        step="100000"
+                        step="1000"
                       />
                     ) : (
-                      formatCurrency(apartment.rentPrice)
+                      <span className="font-semibold text-green-600">
+                        {formatCurrency(parkingFee.feeAmount)}
+                      </span>
                     )}
                   </td>
-                  <td className="px-4 py-3 text-sm">
-                    {editingId === apartment.id ? (
-                      <select
-                        value={editForm.status}
-                        onChange={(e) => handleInputChange('status', e.target.value)}
+                  <td className="px-4 py-3 text-sm text-gray-900">
+                    {editingId === parkingFee.id ? (
+                      <input
+                        type="date"
+                        value={editForm.effectiveDate}
+                        onChange={(e) => handleInputChange('effectiveDate', e.target.value)}
                         className="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      >
-                        <option value="Empty">Empty</option>
-                        <option value="Owned">Owned</option>
-                      </select>
+                      />
                     ) : (
-                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                        apartment.status === 'Empty' 
-                          ? 'bg-yellow-100 text-yellow-800' 
-                          : 'bg-green-100 text-green-800'
-                      }`}>
-                        {apartment.status}
+                      <span className="text-blue-600">
+                        {formatDate(parkingFee.effectiveDate)}
                       </span>
                     )}
                   </td>
                   <td className="px-4 py-3 text-sm">
                     <div className="flex items-center gap-2">
-                      {editingId === apartment.id ? (
+                      {editingId === parkingFee.id ? (
                         <>
                           <button
                             onClick={handleSaveEdit}
@@ -365,14 +366,14 @@ const ParkingFrees = () => {
                       ) : (
                         <>
                           <button
-                            onClick={() => handleEdit(apartment)}
+                            onClick={() => handleEdit(parkingFee)}
                             className="p-1 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded transition-colors"
                             title="Edit"
                           >
                             <Edit size={16} />
                           </button>
                           <button
-                            onClick={() => handleDelete(apartment.id)}
+                            onClick={() => handleDelete(parkingFee.id)}
                             className="p-1 text-red-600 hover:text-red-800 hover:bg-red-50 rounded transition-colors"
                             title="Delete"
                           >
@@ -390,19 +391,19 @@ const ParkingFrees = () => {
 
         {/* Footer */}
         <div className="p-4 text-sm text-gray-600 border-t border-gray-200">
-          Showing {Math.min(entriesPerPage, filteredApartments.length)} of {filteredApartments.length} entries
-          {searchTerm && ` (filtered from ${apartments.length} total entries)`}
+          Showing {Math.min(entriesPerPage, filteredParkingFees.length)} of {filteredParkingFees.length} entries
+          {searchTerm && ` (filtered from ${parkingFees.length} total entries)`}
         </div>
       </div>
 
-      {/* Add Apartment Modal */}
+      {/* Add Parking Fee Modal */}
       {showAddModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-lg shadow-xl w-full max-w-md">
             <div className="p-6">
               {/* Modal Header */}
               <div className="flex justify-between items-center mb-6">
-                <h2 className="text-xl font-semibold text-gray-900">Add New Apartment</h2>
+                <h2 className="text-xl font-semibold text-gray-900">Add New Parking Fee</h2>
                 <button
                   onClick={handleCancelAdd}
                   className="text-gray-400 hover:text-gray-600 transition-colors p-1"
@@ -415,76 +416,57 @@ const ParkingFrees = () => {
               <div className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Apartment Number <span className="text-red-500">*</span>
+                    Vehicle Type <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="text"
-                    value={addForm.number}
-                    onChange={(e) => handleAddInputChange('number', e.target.value)}
+                    value={addForm.vehicleType}
+                    onChange={(e) => handleAddInputChange('vehicleType', e.target.value)}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    placeholder="Enter apartment number (e.g., 101, 202)"
+                    placeholder="e.g., Motorcycle, Car, Bicycle"
                   />
                 </div>
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Building
-                  </label>
-                  <select
-                    value={addForm.building}
-                    onChange={(e) => handleAddInputChange('building', e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  >
-                    <option value="A">Building A</option>
-                    <option value="B">Building B</option>
-                    <option value="C">Building C</option>
-                    <option value="D">Building D</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Rent Price (VND) <span className="text-red-500">*</span>
+                    Fee Amount (VND) <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="number"
-                    value={addForm.rentPrice}
-                    onChange={(e) => handleAddInputChange('rentPrice', e.target.value)}
+                    value={addForm.feeAmount}
+                    onChange={(e) => handleAddInputChange('feeAmount', e.target.value)}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    placeholder="Enter rent price in VND"
+                    placeholder="Enter fee amount in VND"
                     min="0"
-                    step="100000"
+                    step="1000"
                   />
                 </div>
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Status
+                    Effective Date <span className="text-red-500">*</span>
                   </label>
-                  <select
-                    value={addForm.status}
-                    onChange={(e) => handleAddInputChange('status', e.target.value)}
+                  <input
+                    type="date"
+                    value={addForm.effectiveDate}
+                    onChange={(e) => handleAddInputChange('effectiveDate', e.target.value)}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  >
-                    <option value="Empty">Empty</option>
-                    <option value="Owned">Owned</option>
-                  </select>
+                  />
                 </div>
               </div>
 
               {/* Modal Actions */}
               <div className="flex gap-3 mt-6">
                 <button
-                  onClick={handleSaveNewApartment}
-                  className=" mt-4 flex-1 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md transition-colors flex items-center justify-center gap-2 font-medium"
+                  onClick={handleSaveNewParkingFee}
+                  className="flex-1 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md transition-colors flex items-center justify-center gap-2 font-medium"
                 >
                   <Check size={16} />
-                  Add Apartment
+                  Add Parking Fee
                 </button>
-            
                 <button
                   onClick={handleCancelAdd}
-                  className="mt-4 flex-1 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md transition-colors flex items-center justify-center gap-2 font-medium"
+                  className="flex-1 bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-md transition-colors flex items-center justify-center gap-2 font-medium"
                 >
                   <X size={16} />
                   Cancel
@@ -498,4 +480,4 @@ const ParkingFrees = () => {
   );
 };
 
-export default ParkingFrees;
+export default ParkingFees;

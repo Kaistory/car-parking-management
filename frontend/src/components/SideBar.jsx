@@ -10,7 +10,7 @@ const SideBar = () =>{
     { icon: Users, label: 'Residents' },
     { icon: Car, label: 'Vehicles' },
     { icon: Calendar, label: 'Parking Records' },
-    { icon: Clock, label: 'Real Time Parking' },
+    // { icon: Clock, label: 'Real Time Parking' },
     { icon: Coins, label: 'Parking Fees' },
     { icon: HandCoins, label: 'Parking Payments' },
     { icon: Monitor, label: 'Controller Parking' },
