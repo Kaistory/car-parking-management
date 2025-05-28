@@ -3,6 +3,13 @@ import SideBar from '../components/SideBar';
 import Header from '../components/Header';
 import { useContext } from "react";
 import { DashBoardContext } from "../context/DashboardContext";
+import Resident from '../components/Resident';
+import Vehicles from '../components/Vehicles';
+import ParkingRecords from "../components/ParkingRecords";
+import RealTimeParking from "../components/RealTimeParking";
+import ParkingFrees from "../components/ParkingFees";
+import ParkingPayments from "../components/ParkingPayments";
+import ControllerParking from '../components/ControllerParking';
 const Dashboard = () => {
 
   const { activeItem } = useContext(DashBoardContext);
@@ -20,6 +27,13 @@ const Dashboard = () => {
 
         {/* Content */}
         {(activeItem === 'Dashboard') && <MainContent/>}
+        {(activeItem === 'Residents') && <Resident/>}
+        {(activeItem === 'Vehicles') && <Vehicles/>}
+        {(activeItem === 'Parking Records') && <ParkingRecords/>}
+        {(activeItem === 'Real Time Parking') && <RealTimeParking/>}
+        {(activeItem === 'Parking Fees') && <ParkingFrees/>}
+        {(activeItem === 'Parking Payments') && <ParkingPayments/>}
+        {(activeItem === 'Controller Parking') && <ControllerParking/>}
       </div>
     </div>
   );

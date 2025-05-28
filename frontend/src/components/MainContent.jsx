@@ -1,5 +1,3 @@
-import SideBar from '../components/SideBar';
-import Header from '../components/Header';
 import StatsCards from '../components/StatsCards';
 import MediaStats from "../components/MediaStats";
 import TrafficChart from '../components/TrafficChart';

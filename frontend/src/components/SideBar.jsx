@@ -1,4 +1,4 @@
-import { Home, Users, Car, BarChart3, Calendar, Mail, Archive, Clock, Layers, FileText, Grid, TrendingUp, TrendingDown, Facebook, Twitter, Linkedin, Bell, Search, MessageSquare } from 'lucide-react';
+import { Home, Users, Car, HandCoins, Calendar, Mail, Archive, Clock, Coins, Monitor, Grid, TrendingUp, TrendingDown, Facebook, Twitter, Linkedin, Bell, Search, MessageSquare } from 'lucide-react';
 import React, { useState, useContext } from 'react';
 import { DashBoardContext } from '../context/DashboardContext';
 
@@ -11,10 +11,10 @@ const SideBar = () =>{
     { icon: Car, label: 'Vehicles' },
     { icon: Calendar, label: 'Parking Records' },
     { icon: Clock, label: 'Real Time Parking' },
+    { icon: Coins, label: 'Parking Fees' },
+    { icon: HandCoins, label: 'Parking Payments' },
+    { icon: Monitor, label: 'Controller Parking' },
     { icon: Mail, label: 'Mail' },
-    { icon: Archive, label: 'Archive' },
-    { icon: FileText, label: 'Blog' },
-    { icon: Bell, label: 'Notifications' },
     { icon: Grid, label: 'Widgets' },
     ];
     
@@ -22,10 +22,10 @@ const SideBar = () =>{
         <div className="w-64 bg-gray-800 text-white">
         <div className="p-4">
           <div className="flex items-center space-x-2">
-            <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
-              <span className="text-white font-bold">C</span>
-            </div>
-            <span className="text-xl font-semibold">Paking</span>
+             <div className="bg-orange-500 p-2 rounded-lg">
+                            <Car className="h-6 w-6 text-white" />
+              </div>
+            <span className="text-xl font-semibold">Parking</span>
           </div>
         </div>
         

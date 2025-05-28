@@ -9,6 +9,7 @@ const Header = () =>{
     const {user, logoutUser} = useContext(AuthContext);
     const {activeItem} = useContext(DashBoardContext);
     const [isOpen, setIsOpen] = useState(false);
+    const [currentTime, setCurrentTime] = useState(new Date());
     const dropdownRef = useRef(null);
 
     // Đóng dropdown khi click bên ngoài
@@ -24,6 +25,25 @@ const Header = () =>{
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, []);
+  useEffect(() => {
+      const timer = setInterval(() => {
+        setCurrentTime(new Date());
+      }, 1000);
+      return () => clearInterval(timer);
+    }, []);
+
+  const formatDate = (date) => {
+    return date.toLocaleDateString('vi-VN');
+  };
+
+  const formatTime = (date) => {
+    return date.toLocaleTimeString('vi-VN', { 
+      hour12: false,
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit'
+    });
+  };
 
   const toggleDropdown = () => {
     setIsOpen(!isOpen);
@@ -46,6 +66,9 @@ const Header = () =>{
               <span className="text-gray-500">{activeItem}</span>
             </div>
             <div className="flex items-center space-x-4">
+              <div className="text-sm text-gray-600">
+              {formatDate(currentTime)} - {formatTime(currentTime)}
+              </div>
               <Button className="p-2 text-gray-500 hover:text-gray-700">
                 <Search className="w-5 h-5" />
               </Button>
