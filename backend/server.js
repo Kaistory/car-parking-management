@@ -3,7 +3,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const dotenv = require('dotenv');
-var mqtt = require('mqtt')
+
 
 // Route
 const userRoute = require("./routes/userRoutes");
@@ -19,41 +19,10 @@ const URI = process.env.ATLAS_URI;
 mongoose.connect(URI, { useNewUrlParser: true,useUnifiedTopology: true })
 .then(() =>console.log("Connected to MongoDB"))
         .catch(err => console.log("Error connecting to MongoDB"));
-// MQTT
-var options = {
-    host: '76bf78e5731240cbb090e3284089c085.s1.eu.hivemq.cloud',
-    port: 8883,
-    protocol: 'mqtts',
-    username: 'carController',
-    password: 'Khaito4224!'
-}
+// Initialize MQTT controller
+const mqttController = require('./Mqtt-controller');
 
-// initialize the MQTT client
-var client = mqtt.connect(options);
-
-// setup the callbacks
-client.on('connect', function () {
-    console.log('Connected');
-});
-
-client.on('error', function (error) {
-    console.log(error);
-});
-
-client.on('message', function (topic, message) {
-    // called each time a message is received
-    if (topic === 'esp8266/data_rfid') {
-    console.log('Received message dht11:', topic, message.toString());
-    client.publish('esp8266/client', '{"message":"open","amount":"136"}');
-  }
-    
-   
-});
-
-// subscribe to topic 'my/test/topic'
-client.subscribe('esp8266/data_rfid');
-
-
+mqttController();
 
 
 

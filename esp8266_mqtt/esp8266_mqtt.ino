@@ -14,7 +14,6 @@
 // set the LCD number of columns and rows
 int lcdColumns = 16;
 int lcdRows = 2;
-String uidString = "";
 
 // set LCD address, number of columns and rows
 // if you don't know your display address, run an I2C scanner sketch
@@ -142,16 +141,6 @@ void setup() {
   client.setCallback(callback);
 
 }
-void callClient(){
-  {
-      DynamicJsonDocument doc_2(1024);
-    char mqtt_message_2[128];
-    doc_2["RFID"]= uidString;
-    doc_2["opened"] = opened;
-    serializeJson(doc_2,mqtt_message_2);
-    publishMessage("esp8266/data_rfid", mqtt_message_2, true);
-    }
-}
 unsigned long timeUpdata=millis();
 int pos = 0;
 bool current_opened = opened;
@@ -202,7 +191,7 @@ void loop() {
 
   
   // Save the UID on a String variable
-  uidString = "";
+  String uidString = "";
   for (byte i = 0; i < mfrc522.uid.size; i++) {
     if (mfrc522.uid.uidByte[i] < 0x10) {
       uidString += "0"; 
@@ -216,6 +205,4 @@ void loop() {
   doc["opened"] = opened;
   serializeJson(doc,mqtt_message);
   publishMessage("esp8266/data_rfid", mqtt_message, true);
-
- 
 }
