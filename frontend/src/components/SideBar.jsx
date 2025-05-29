@@ -7,7 +7,7 @@ const SideBar = () =>{
     
      const sidebarItems = [
     { icon: Home, label: 'Dashboard', active: true },
-    { icon: Users, label: 'Residents' },
+    { icon: Users, label: 'Apartment' },
     { icon: Car, label: 'Vehicles' },
     { icon: Calendar, label: 'Parking Records' },
     // { icon: Clock, label: 'Real Time Parking' },

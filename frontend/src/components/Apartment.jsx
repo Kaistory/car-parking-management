@@ -1,23 +1,25 @@
-import React, { useState } from 'react';
+import React, { useState , useContext} from 'react';
 import { Edit, Trash2, Plus, X, Check } from 'lucide-react';
+import { DashBoardContext } from '../context/DashboardContext'
 
 const Resident = () => {
-  const [apartments, setApartments] = useState([
-    { id: 1, ownerName: 'Nguyễn Văn An', apartmentNumber: '201', floor: 2, area: 75 },
-    { id: 2, ownerName: 'Trần Thị Bình', apartmentNumber: '269', floor: 2, area: 68 },
-    { id: 3, ownerName: 'Lê Minh Cường', apartmentNumber: '333', floor: 3, area: 85 },
-    { id: 4, ownerName: 'Phạm Thị Dung', apartmentNumber: '69', floor: 6, area: 72 },
-    { id: 5, ownerName: '', apartmentNumber: '255', floor: 2, area: 65 },
-    { id: 6, ownerName: '', apartmentNumber: '86', floor: 8, area: 90 },
-    { id: 7, ownerName: '', apartmentNumber: '179', floor: 1, area: 58 },
-    { id: 8, ownerName: 'Hoàng Văn Em', apartmentNumber: '321', floor: 3, area: 78 },
-    { id: 9, ownerName: 'Võ Thị Phương', apartmentNumber: '203', floor: 2, area: 82 },
-    { id: 10, ownerName: 'Đặng Minh Giang', apartmentNumber: '888', floor: 8, area: 95 },
-    { id: 11, ownerName: 'Bùi Thị Hương', apartmentNumber: '170', floor: 1, area: 55 },
-    { id: 12, ownerName: '', apartmentNumber: '401', floor: 4, area: 88 },
-    { id: 13, ownerName: 'Ngô Văn Hùng', apartmentNumber: '444', floor: 4, area: 70 }
-  ]);
-
+  const {apartment, updateApartmentById,deleteApartmentById,createApartment} = useContext(DashBoardContext);
+  // const [apartments, setApartments] = useState([
+  //   { _id: 1, ownerName: 'Nguyễn Văn An', apartmentNumber: '201', floor: 2, area: 75 },
+  //   { _id: 2, ownerName: 'Trần Thị Bình', apartmentNumber: '269', floor: 2, area: 68 },
+  //   { _id: 3, ownerName: 'Lê Minh Cường', apartmentNumber: '333', floor: 3, area: 85 },
+  //   { _id: 4, ownerName: 'Phạm Thị Dung', apartmentNumber: '69', floor: 6, area: 72 },
+  //   { _id: 5, ownerName: '', apartmentNumber: '255', floor: 2, area: 65 },
+  //   { _id: 6, ownerName: '', apartmentNumber: '86', floor: 8, area: 90 },
+  //   { _id: 7, ownerName: '', apartmentNumber: '179', floor: 1, area: 58 },
+  //   { _id: 8, ownerName: 'Hoàng Văn Em', apartmentNumber: '321', floor: 3, area: 78 },
+  //   { _id: 9, ownerName: 'Võ Thị Phương', apartmentNumber: '203', floor: 2, area: 82 },
+  //   { _id: 10, ownerName: 'Đặng Minh Giang', apartmentNumber: '888', floor: 8, area: 95 },
+  //   { _id: 11, ownerName: 'Bùi Thị Hương', apartmentNumber: '170', floor: 1, area: 55 },
+  //   { _id: 12, ownerName: '', apartmentNumber: '401', floor: 4, area: 88 },
+  //   { _id: 13, ownerName: 'Ngô Văn Hùng', apartmentNumber: '444', floor: 4, area: 70 }
+  // ]);
+  const [apartments, setApartments] = useState(apartment);
   const [entriesPerPage, setEntriesPerPage] = useState(10);
   const [searchTerm, setSearchTerm] = useState('');
   const [sortConfig, setSortConfig] = useState({ key: null, direction: 'asc' });
@@ -68,7 +70,7 @@ const Resident = () => {
 
   // Edit functions
   const handleEdit = (apartment) => {
-    setEditingId(apartment.id);
+    setEditingId(apartment._id);
     setEditForm({
       ownerName: apartment.ownerName,
       apartmentNumber: apartment.apartmentNumber,
@@ -96,7 +98,7 @@ const Resident = () => {
 
     // Check if apartment number already exists (excluding current apartment)
     const exists = apartments.some(apt => 
-      apt.id !== editingId && 
+      apt._id !== editingId && 
       apt.apartmentNumber.toLowerCase() === editForm.apartmentNumber.trim().toLowerCase()
     );
     if (exists) {
@@ -105,7 +107,7 @@ const Resident = () => {
     }
 
     setApartments(prev => prev.map(apt => 
-      apt.id === editingId 
+      apt._id === editingId 
         ? { 
             ...apt, 
             ownerName: editForm.ownerName.trim(),
@@ -115,6 +117,13 @@ const Resident = () => {
           }
         : apt
     ));
+    updateApartmentById({ 
+            _id: editingId, 
+            ownerName: editForm.ownerName.trim(),
+            apartmentNumber: editForm.apartmentNumber.trim(),
+            floor: parseInt(editForm.floor),
+            area: parseInt(editForm.area)
+          });
     setEditingId(null);
     setEditForm({ ownerName: '', apartmentNumber: '', floor: '', area: '' });
   };
@@ -169,15 +178,15 @@ const Resident = () => {
     }
 
     // Create new apartment
-    const newId = apartments.length > 0 ? Math.max(...apartments.map(apt => apt.id)) + 1 : 1;
+    const newId = apartments.length > 0 ? Math.max(...apartments.map(apt => apt._id)) + 1 : 1;
     const newApartment = {
-      id: newId,
+      _id: newId,
       ownerName: addForm.ownerName.trim(),
       apartmentNumber: addForm.apartmentNumber.trim(),
       floor: parseInt(addForm.floor),
       area: parseInt(addForm.area)
     };
-
+    createApartment(newApartment);
     // Add to apartments list
     setApartments(prev => [...prev, newApartment]);
     
@@ -195,9 +204,10 @@ const Resident = () => {
   };
 
   // Delete function
-  const handleDelete = (id) => {
+  const handleDelete = (_id) => {
     if (window.confirm('Bạn có chắc chắn muốn xóa căn hộ này?')) {
-      setApartments(prev => prev.filter(apt => apt.id !== id));
+      deleteApartmentById(_id);
+      setApartments(prev => prev.filter(apt => apt._id !== _id));    
     }
   };
 
@@ -295,12 +305,12 @@ const Resident = () => {
             </thead>
             <tbody>
               {sortedApartments.slice(0, entriesPerPage).map((apartment, index) => (
-                <tr key={apartment.id} className="hover:bg-gray-50 border-b border-gray-100">
+                <tr key={apartment._id} className="hover:bg-gray-50 border-b border-gray-100">
                   <td className="px-4 py-3 text-sm text-gray-900">
                     {index + 1}
                   </td>
                   <td className="px-4 py-3 text-sm text-gray-900">
-                    {editingId === apartment.id ? (
+                    {editingId === apartment._id ? (
                       <input
                         type="text"
                         value={editForm.apartmentNumber}
@@ -313,7 +323,7 @@ const Resident = () => {
                     )}
                   </td>
                   <td className="px-4 py-3 text-sm text-gray-900">
-                    {editingId === apartment.id ? (
+                    {editingId === apartment._id ? (
                       <input
                         type="text"
                         value={editForm.ownerName}
@@ -328,7 +338,7 @@ const Resident = () => {
                     )}
                   </td>
                   <td className="px-4 py-3 text-sm text-gray-900">
-                    {editingId === apartment.id ? (
+                    {editingId === apartment._id ? (
                       <input
                         type="number"
                         value={editForm.floor}
@@ -342,7 +352,7 @@ const Resident = () => {
                     )}
                   </td>
                   <td className="px-4 py-3 text-sm text-gray-900">
-                    {editingId === apartment.id ? (
+                    {editingId === apartment._id ? (
                       <input
                         type="number"
                         value={editForm.area}
@@ -357,7 +367,7 @@ const Resident = () => {
                   </td>
                   <td className="px-4 py-3 text-sm">
                     <div className="flex items-center gap-2">
-                      {editingId === apartment.id ? (
+                      {editingId === apartment._id ? (
                         <>
                           <button
                             onClick={handleSaveEdit}
@@ -384,7 +394,7 @@ const Resident = () => {
                             <Edit size={16} />
                           </button>
                           <button
-                            onClick={() => handleDelete(apartment.id)}
+                            onClick={() => handleDelete(apartment._id)}
                             className="p-1 text-red-600 hover:text-red-800 hover:bg-red-50 rounded transition-colors"
                             title="Xóa"
                           >

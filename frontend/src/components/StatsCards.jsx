@@ -1,7 +1,9 @@
 
 import { Home, Users, Car, BarChart3, Calendar, Mail, Archive, Clock, Layers, FileText, Grid, TrendingUp, TrendingDown, Facebook, Twitter, Linkedin, Bell, Search, MessageSquare } from 'lucide-react';
+import {DashboardContext} from '../context/DashboardContext';
+import { useContext } from 'react';
 const StatsCards = () => {
-    
+    const {} = useContext(DashboardContext);
       const statsCards = [
         {
           title: '26K',

@@ -3,7 +3,7 @@ import SideBar from '../components/SideBar';
 import Header from '../components/Header';
 import { useContext } from "react";
 import { DashBoardContext } from "../context/DashboardContext";
-import Resident from '../components/Resident';
+import Resident from '../components/Apartment';
 import Vehicles from '../components/Vehicles';
 import ParkingRecords from "../components/ParkingRecords";
 import RealTimeParking from "../components/RealTimeParking";
@@ -27,7 +27,7 @@ const Dashboard = () => {
 
         {/* Content */}
         {(activeItem === 'Dashboard') && <MainContent/>}
-        {(activeItem === 'Residents') && <Resident/>}
+        {(activeItem === 'Apartment') && <Resident/>}
         {(activeItem === 'Vehicles') && <Vehicles/>}
         {(activeItem === 'Parking Records') && <ParkingRecords/>}
         {(activeItem === 'Real Time Parking') && <RealTimeParking/>}

@@ -1,13 +1,15 @@
 import { Home, Users, Car, Coins, BarChart3, Calendar, Mail, Archive, Clock, Layers, FileText, Grid, TrendingUp, TrendingDown, Facebook, Twitter, Linkedin, Bell, Search, MessageSquare } from 'lucide-react';
-
+import { DashBoardContext } from '../context/DashboardContext'
+import { useContext } from 'react';
 const MediaStats = () =>{
+    const {apartment} = useContext(DashBoardContext);
     return (
         <div className="space-y-4">
               <div className="bg-blue-600 rounded-lg p-6 text-white flex items-center justify-between">
                 <Users className="w-8 h-8" />
                 <div className="text-right">
-                  <p className="text-2xl font-bold">89,400</p>
-                  <p className="text-sm opacity-90">Resident</p>
+                  <p className="text-2xl font-bold">{apartment.length}</p>
+                  <p className="text-sm opacity-90">Apartment</p>
                 </div>
               </div>
               
