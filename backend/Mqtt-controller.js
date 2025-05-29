@@ -69,5 +69,36 @@ const mqttController = () => {
   // Subscribe to topic 'esp8266/data_rfid'
   client.subscribe('esp8266/data_rfid');
 }
+const openDoor = () =>{
+  var options = {
+    host: '76bf78e5731240cbb090e3284089c085.s1.eu.hivemq.cloud',
+    port: 8883,
+    protocol: 'mqtts',
+    username: 'carController',
+    password: 'Khaito4224!'
+  } 
+  var client = mqtt.connect(options);
 
-module.exports = mqttController;
+  client.on('connect', function () {
+    console.log('Connected to MQTT broker');
+    client.publish('esp8266/client', '{"message":"open"}');
+    client.end();
+  });
+}
+const closeDoor = () =>{
+  var options = {
+    host: '76bf78e5731240cbb090e3284089c085.s1.eu.hivemq.cloud',
+    port: 8883,
+    protocol: 'mqtts',
+    username: 'carController',
+    password: 'Khaito4224!'
+  } 
+  var client = mqtt.connect(options);
+
+  client.on('connect', function () {
+    console.log('Connected to MQTT broker');
+    client.publish('esp8266/client', '{"message":"clos"}');
+    client.end();
+  });
+}
+module.exports = {mqttController, openDoor, closeDoor};
