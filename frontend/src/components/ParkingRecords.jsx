@@ -1,90 +1,11 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { Edit, Trash2, Plus, X, Check } from 'lucide-react';
+import { DashBoardContext } from '../context/DashboardContext';
 
 const ParkingRecords = () => {
-  const [parkingRecords, setParkingRecords] = useState([
-    { 
-      id: 1, 
-      vehicleId: '673a2b1c4f8e9d0012345678', 
-      vehicleModel: 'ResidentVehicle', 
-      entryTime: new Date('2024-05-28T08:30:00'), 
-      exitTime: null, 
-      status: 'IN' 
-    },
-    { 
-      id: 2, 
-      vehicleId: '673a2b1c4f8e9d0012345679', 
-      vehicleModel: 'VisitorVehicle', 
-      entryTime: new Date('2024-05-28T09:15:00'), 
-      exitTime: new Date('2024-05-28T11:45:00'), 
-      status: 'OUT' 
-    },
-    { 
-      id: 3, 
-      vehicleId: '673a2b1c4f8e9d001234567a', 
-      vehicleModel: 'ResidentVehicle', 
-      entryTime: new Date('2024-05-28T07:00:00'), 
-      exitTime: null, 
-      status: 'IN' 
-    },
-    { 
-      id: 4, 
-      vehicleId: '673a2b1c4f8e9d001234567b', 
-      vehicleModel: 'VisitorVehicle', 
-      entryTime: new Date('2024-05-28T10:20:00'), 
-      exitTime: new Date('2024-05-28T12:30:00'), 
-      status: 'OUT' 
-    },
-    { 
-      id: 5, 
-      vehicleId: '673a2b1c4f8e9d001234567c', 
-      vehicleModel: 'ResidentVehicle', 
-      entryTime: new Date('2024-05-28T06:45:00'), 
-      exitTime: null, 
-      status: 'IN' 
-    },
-    { 
-      id: 6, 
-      vehicleId: '673a2b1c4f8e9d001234567d', 
-      vehicleModel: 'VisitorVehicle', 
-      entryTime: new Date('2024-05-27T14:30:00'), 
-      exitTime: new Date('2024-05-27T16:20:00'), 
-      status: 'OUT' 
-    },
-    { 
-      id: 7, 
-      vehicleId: '673a2b1c4f8e9d001234567e', 
-      vehicleModel: 'ResidentVehicle', 
-      entryTime: new Date('2024-05-28T13:15:00'), 
-      exitTime: null, 
-      status: 'IN' 
-    },
-    { 
-      id: 8, 
-      vehicleId: '673a2b1c4f8e9d001234567f', 
-      vehicleModel: 'VisitorVehicle', 
-      entryTime: new Date('2024-05-28T11:00:00'), 
-      exitTime: new Date('2024-05-28T13:45:00'), 
-      status: 'OUT' 
-    },
-    { 
-      id: 9, 
-      vehicleId: '673a2b1c4f8e9d0012345680', 
-      vehicleModel: 'ResidentVehicle', 
-      entryTime: new Date('2024-05-28T05:30:00'), 
-      exitTime: null, 
-      status: 'IN' 
-    },
-    { 
-      id: 10, 
-      vehicleId: '673a2b1c4f8e9d0012345681', 
-      vehicleModel: 'VisitorVehicle', 
-      entryTime: new Date('2024-05-28T16:00:00'), 
-      exitTime: null, 
-      status: 'IN' 
-    }
-  ]);
-
+  const {recordsParking} = useContext(DashBoardContext);
+  
+  const [parkingRecords, setParkingRecords] = useState(recordsParking);
   const [entriesPerPage, setEntriesPerPage] = useState(10);
   const [searchTerm, setSearchTerm] = useState('');
   const [sortConfig, setSortConfig] = useState({ key: null, direction: 'asc' });
@@ -132,13 +53,14 @@ const ParkingRecords = () => {
   };
 
   // Filter parking records based on search term
-  const filteredRecords = parkingRecords.filter(record =>
-    record.vehicleId.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    record.vehicleModel.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    record.status.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    formatDateTime(record.entryTime).toLowerCase().includes(searchTerm.toLowerCase()) ||
-    (record.exitTime && formatDateTime(record.exitTime).toLowerCase().includes(searchTerm.toLowerCase()))
-  );
+  const filteredRecords = parkingRecords.filter(record => {
+    const vehicleIdStr = record.vehicleId || 'N/A';
+    return vehicleIdStr.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      record.vehicleModel.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      record.status.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      formatDateTime(record.entryTime).toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (record.exitTime && formatDateTime(record.exitTime).toLowerCase().includes(searchTerm.toLowerCase()));
+  });
 
   // Sort parking records
   const sortedRecords = [...filteredRecords].sort((a, b) => {
@@ -146,6 +68,12 @@ const ParkingRecords = () => {
     
     let aValue = a[sortConfig.key];
     let bValue = b[sortConfig.key];
+    
+    // Handle null vehicleId for sorting
+    if (sortConfig.key === 'vehicleId') {
+      aValue = aValue || '';
+      bValue = bValue || '';
+    }
     
     // Handle date sorting
     if (sortConfig.key === 'entryTime' || sortConfig.key === 'exitTime') {
@@ -176,9 +104,9 @@ const ParkingRecords = () => {
 
   // Edit functions
   const handleEdit = (record) => {
-    setEditingId(record.id);
+    setEditingId(record._id);
     setEditForm({
-      vehicleId: record.vehicleId,
+      vehicleId: record.vehicleId || '',
       vehicleModel: record.vehicleModel,
       entryTime: record.entryTime ? new Date(record.entryTime).toISOString().slice(0, 16) : '',
       exitTime: record.exitTime ? new Date(record.exitTime).toISOString().slice(0, 16) : '',
@@ -188,10 +116,6 @@ const ParkingRecords = () => {
 
   const handleSaveEdit = () => {
     // Validation
-    if (!editForm.vehicleId.trim()) {
-      alert('Please enter a valid Vehicle ID');
-      return;
-    }
     if (!editForm.entryTime) {
       alert('Please enter entry time');
       return;
@@ -202,13 +126,13 @@ const ParkingRecords = () => {
     }
 
     setParkingRecords(prev => prev.map(record => 
-      record.id === editingId 
+      record._id === editingId 
         ? { 
             ...record, 
-            vehicleId: editForm.vehicleId.trim(),
+            vehicleId: editForm.vehicleId.trim() || null,
             vehicleModel: editForm.vehicleModel,
-            entryTime: new Date(editForm.entryTime),
-            exitTime: editForm.exitTime ? new Date(editForm.exitTime) : null,
+            entryTime: editForm.entryTime,
+            exitTime: editForm.exitTime || null,
             status: editForm.status
           }
         : record
@@ -251,10 +175,6 @@ const ParkingRecords = () => {
 
   const handleSaveNewRecord = () => {
     // Validation
-    if (!addForm.vehicleId.trim()) {
-      alert('Please enter Vehicle ID');
-      return;
-    }
     if (!addForm.entryTime) {
       alert('Please enter entry time');
       return;
@@ -264,15 +184,15 @@ const ParkingRecords = () => {
       return;
     }
 
-    // Create new parking record
-    const newId = parkingRecords.length > 0 ? Math.max(...parkingRecords.map(record => record.id)) + 1 : 1;
+    // Create new parking record with MongoDB-like structure
     const newRecord = {
-      id: newId,
-      vehicleId: addForm.vehicleId.trim(),
+      _id: new Date().getTime().toString(), // Generate temporary ID
+      vehicleId: addForm.vehicleId.trim() || null,
       vehicleModel: addForm.vehicleModel,
-      entryTime: new Date(addForm.entryTime),
-      exitTime: addForm.exitTime ? new Date(addForm.exitTime) : null,
-      status: addForm.status
+      entryTime: addForm.entryTime,
+      exitTime: addForm.exitTime || null,
+      status: addForm.status,
+      __v: 0
     };
 
     // Add to parking records list
@@ -292,9 +212,9 @@ const ParkingRecords = () => {
   };
 
   // Delete function
-  const handleDelete = (id) => {
+  const handleDelete = (_id) => {
     if (window.confirm('Are you sure you want to delete this parking record?')) {
-      setParkingRecords(prev => prev.filter(record => record.id !== id));
+      setParkingRecords(prev => prev.filter(record => record._id !== _id));
     }
   };
 
@@ -404,24 +324,27 @@ const ParkingRecords = () => {
             </thead>
             <tbody>
               {sortedRecords.slice(0, entriesPerPage).map((record, index) => (
-                <tr key={record.id} className="hover:bg-gray-50 border-b border-gray-100">
+                <tr key={record._id} className="hover:bg-gray-50 border-b border-gray-100">
                   <td className="px-4 py-3 text-sm text-gray-900">
                     {index + 1}
                   </td>
                   <td className="px-4 py-3 text-sm text-gray-900">
-                    {editingId === record.id ? (
+                    {editingId === record._id ? (
                       <input
                         type="text"
                         value={editForm.vehicleId}
                         onChange={(e) => handleInputChange('vehicleId', e.target.value)}
                         className="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        placeholder="Vehicle ID (optional)"
                       />
                     ) : (
-                      <span className="font-mono text-xs">{record.vehicleId}</span>
+                      <span className={`font-mono text-xs ${record.vehicleId ? '' : 'text-gray-400 italic'}`}>
+                        {record.vehicleId || 'N/A'}
+                      </span>
                     )}
                   </td>
                   <td className="px-4 py-3 text-sm text-gray-900">
-                    {editingId === record.id ? (
+                    {editingId === record._id ? (
                       <select
                         value={editForm.vehicleModel}
                         onChange={(e) => handleInputChange('vehicleModel', e.target.value)}
@@ -441,7 +364,7 @@ const ParkingRecords = () => {
                     )}
                   </td>
                   <td className="px-4 py-3 text-sm text-gray-900">
-                    {editingId === record.id ? (
+                    {editingId === record._id ? (
                       <input
                         type="datetime-local"
                         value={editForm.entryTime}
@@ -453,7 +376,7 @@ const ParkingRecords = () => {
                     )}
                   </td>
                   <td className="px-4 py-3 text-sm text-gray-900">
-                    {editingId === record.id ? (
+                    {editingId === record._id ? (
                       <input
                         type="datetime-local"
                         value={editForm.exitTime}
@@ -468,7 +391,7 @@ const ParkingRecords = () => {
                     {calculateDuration(record.entryTime, record.exitTime)}
                   </td>
                   <td className="px-4 py-3 text-sm">
-                    {editingId === record.id ? (
+                    {editingId === record._id ? (
                       <select
                         value={editForm.status}
                         onChange={(e) => handleInputChange('status', e.target.value)}
@@ -489,7 +412,7 @@ const ParkingRecords = () => {
                   </td>
                   <td className="px-4 py-3 text-sm">
                     <div className="flex items-center gap-2">
-                      {editingId === record.id ? (
+                      {editingId === record._id ? (
                         <>
                           <button
                             onClick={handleSaveEdit}
@@ -516,7 +439,7 @@ const ParkingRecords = () => {
                             <Edit size={16} />
                           </button>
                           <button
-                            onClick={() => handleDelete(record.id)}
+                            onClick={() => handleDelete(record._id)}
                             className="p-1 text-red-600 hover:text-red-800 hover:bg-red-50 rounded transition-colors"
                             title="Delete"
                           >
@@ -559,15 +482,16 @@ const ParkingRecords = () => {
               <div className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Vehicle ID <span className="text-red-500">*</span>
+                    Vehicle ID
                   </label>
                   <input
                     type="text"
                     value={addForm.vehicleId}
                     onChange={(e) => handleAddInputChange('vehicleId', e.target.value)}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent font-mono text-sm"
-                    placeholder="Enter vehicle ID (e.g., 673a2b1c4f8e9d0012345678)"
+                    placeholder="Enter vehicle ID (optional)"
                   />
+                  <p className="text-xs text-gray-500 mt-1">Leave empty if vehicle ID is not available</p>
                 </div>
 
                 <div>

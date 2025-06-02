@@ -1,18 +1,20 @@
-import React, { useState } from 'react';
+import React, { useState,useContext } from 'react';
 import { Edit, Trash2, Plus, X, Check } from 'lucide-react';
-
+import { DashBoardContext } from '../context/DashboardContext';
 const ParkingFees = () => {
-  const [parkingFees, setParkingFees] = useState([
-    { id: 1, vehicleType: 'Motorcycle', feeAmount: 50000, effectiveDate: new Date('2024-01-01') },
-    { id: 2, vehicleType: 'Car', feeAmount: 200000, effectiveDate: new Date('2024-01-01') },
-    { id: 3, vehicleType: 'Bicycle', feeAmount: 20000, effectiveDate: new Date('2024-02-01') },
-    { id: 4, vehicleType: 'Electric Scooter', feeAmount: 75000, effectiveDate: new Date('2024-01-15') },
-    { id: 5, vehicleType: 'Truck', feeAmount: 500000, effectiveDate: new Date('2024-03-01') },
-    { id: 6, vehicleType: 'Bus', feeAmount: 800000, effectiveDate: new Date('2024-02-15') },
-    { id: 7, vehicleType: 'Van', feeAmount: 300000, effectiveDate: new Date('2024-01-20') },
-    { id: 8, vehicleType: 'SUV', feeAmount: 250000, effectiveDate: new Date('2024-02-10') }
-  ]);
+  const { feesParking, updateFeeById, deleteFeeById, createFee } = useContext(DashBoardContext);
+  // const [parkingFees, setParkingFees] = useState([
+  //   { _id: "6833f5d50eb50789395627f6", vehicleType: 'Motorcycle', feeAmount: 50000, effectiveDate: "2024-01-01T00:00:00.000Z", __v: 0 },
+  //   { _id: "6833f5d50eb50789395627f7", vehicleType: 'Car', feeAmount: 200000, effectiveDate: "2024-01-01T00:00:00.000Z", __v: 0 },
+  //   { _id: "6833f5d50eb50789395627f8", vehicleType: 'Bicycle', feeAmount: 20000, effectiveDate: "2024-02-01T00:00:00.000Z", __v: 0 },
+  //   { _id: "6833f5d50eb50789395627f9", vehicleType: 'Electric Scooter', feeAmount: 75000, effectiveDate: "2024-01-15T00:00:00.000Z", __v: 0 },
+  //   { _id: "6833f5d50eb50789395627fa", vehicleType: 'Truck', feeAmount: 500000, effectiveDate: "2024-03-01T00:00:00.000Z", __v: 0 },
+  //   { _id: "6833f5d50eb50789395627fb", vehicleType: 'Bus', feeAmount: 800000, effectiveDate: "2024-02-15T00:00:00.000Z", __v: 0 },
+  //   { _id: "6833f5d50eb50789395627fc", vehicleType: 'Van', feeAmount: 300000, effectiveDate: "2024-01-20T00:00:00.000Z", __v: 0 },
+  //   { _id: "6833f5d50eb50789395627fd", vehicleType: 'SUV', feeAmount: 250000, effectiveDate: "2024-02-10T00:00:00.000Z", __v: 0 }
+  // ]);
 
+  const [parkingFees, setParkingFees] = useState(feesParking);
   const [entriesPerPage, setEntriesPerPage] = useState(10);
   const [searchTerm, setSearchTerm] = useState('');
   const [sortConfig, setSortConfig] = useState({ key: null, direction: 'asc' });
@@ -33,14 +35,21 @@ const ParkingFees = () => {
     }).format(amount);
   };
 
-  // Helper function to format date
-  const formatDate = (date) => {
-    return new Date(date).toLocaleDateString('vi-VN');
+  // Helper function to format date from ISO string
+  const formatDate = (dateString) => {
+    return new Date(dateString).toLocaleDateString('vi-VN');
   };
 
-  // Helper function to format date for input
-  const formatDateForInput = (date) => {
-    return new Date(date).toISOString().split('T')[0];
+  // Helper function to format date for input from ISO string
+  const formatDateForInput = (dateString) => {
+    return new Date(dateString).toISOString().split('T')[0];
+  };
+
+  // Generate MongoDB-like ObjectId (simple mock for demo)
+  const generateObjectId = () => {
+    const timestamp = Math.floor(Date.now() / 1000).toString(16);
+    const randomHex = Math.random().toString(16).substring(2, 18);
+    return timestamp + randomHex.padEnd(16, '0');
   };
 
   // Filter parking fees based on search term
@@ -57,7 +66,7 @@ const ParkingFees = () => {
     let aValue = a[sortConfig.key];
     let bValue = b[sortConfig.key];
     
-    // Handle date sorting
+    // Handle date sorting for ISO strings
     if (sortConfig.key === 'effectiveDate') {
       aValue = new Date(aValue);
       bValue = new Date(bValue);
@@ -86,7 +95,7 @@ const ParkingFees = () => {
 
   // Edit functions
   const handleEdit = (parkingFee) => {
-    setEditingId(parkingFee.id);
+    setEditingId(parkingFee._id);
     setEditForm({
       vehicleType: parkingFee.vehicleType,
       feeAmount: parkingFee.feeAmount.toString(),
@@ -112,15 +121,21 @@ const ParkingFees = () => {
     }
 
     setParkingFees(prev => prev.map(fee => 
-      fee.id === editingId 
+      fee._id === editingId 
         ? { 
             ...fee, 
             vehicleType: editForm.vehicleType.trim(),
             feeAmount: parseFloat(editForm.feeAmount),
-            effectiveDate: new Date(editForm.effectiveDate)
+            effectiveDate: new Date(editForm.effectiveDate).toISOString()
           }
         : fee
     ));
+    updateFeeById({
+      _id: editingId,
+      vehicleType: editForm.vehicleType.trim(),
+      feeAmount: parseFloat(editForm.feeAmount),
+      effectiveDate: new Date(editForm.effectiveDate).toISOString()
+    });
     setEditingId(null);
     setEditForm({ vehicleType: '', feeAmount: '', effectiveDate: '' });
   };
@@ -143,7 +158,7 @@ const ParkingFees = () => {
     setAddForm({ 
       vehicleType: '', 
       feeAmount: '', 
-      effectiveDate: formatDateForInput(new Date()) 
+      effectiveDate: formatDateForInput(new Date().toISOString()) 
     });
   };
 
@@ -178,15 +193,15 @@ const ParkingFees = () => {
       return;
     }
 
-    // Create new parking fee
-    const newId = parkingFees.length > 0 ? Math.max(...parkingFees.map(fee => fee.id)) + 1 : 1;
+    // Create new parking fee with MongoDB-like structure
     const newParkingFee = {
-      id: newId,
+      _id: generateObjectId(),
       vehicleType: addForm.vehicleType.trim(),
       feeAmount: parseFloat(addForm.feeAmount),
-      effectiveDate: new Date(addForm.effectiveDate)
+      effectiveDate: new Date(addForm.effectiveDate).toISOString(),
+      __v: 0
     };
-
+    createFee(newParkingFee);
     // Add to parking fees list
     setParkingFees(prev => [...prev, newParkingFee]);
     
@@ -204,9 +219,10 @@ const ParkingFees = () => {
   };
 
   // Delete function
-  const handleDelete = (id) => {
+  const handleDelete = (_id) => {
     if (window.confirm('Are you sure you want to delete this parking fee?')) {
-      setParkingFees(prev => prev.filter(fee => fee.id !== id));
+      deleteFeeById(_id);
+      setParkingFees(prev => prev.filter(fee => fee._id !== _id));
     }
   };
 
@@ -215,7 +231,6 @@ const ParkingFees = () => {
       <div className="bg-white rounded-lg shadow-sm">
         {/* Header */}
         <div className="p-4 border-b border-gray-200">
-          
           <button 
             onClick={openAddModal}
             className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md flex items-center gap-2 transition-colors"
@@ -296,12 +311,12 @@ const ParkingFees = () => {
             </thead>
             <tbody>
               {sortedParkingFees.slice(0, entriesPerPage).map((parkingFee, index) => (
-                <tr key={parkingFee.id} className="hover:bg-gray-50 border-b border-gray-100">
+                <tr key={parkingFee._id} className="hover:bg-gray-50 border-b border-gray-100">
                   <td className="px-4 py-3 text-sm text-gray-900">
                     {index + 1}
                   </td>
                   <td className="px-4 py-3 text-sm text-gray-900">
-                    {editingId === parkingFee.id ? (
+                    {editingId === parkingFee._id ? (
                       <input
                         type="text"
                         value={editForm.vehicleType}
@@ -314,7 +329,7 @@ const ParkingFees = () => {
                     )}
                   </td>
                   <td className="px-4 py-3 text-sm text-gray-900">
-                    {editingId === parkingFee.id ? (
+                    {editingId === parkingFee._id ? (
                       <input
                         type="number"
                         value={editForm.feeAmount}
@@ -331,7 +346,7 @@ const ParkingFees = () => {
                     )}
                   </td>
                   <td className="px-4 py-3 text-sm text-gray-900">
-                    {editingId === parkingFee.id ? (
+                    {editingId === parkingFee._id ? (
                       <input
                         type="date"
                         value={editForm.effectiveDate}
@@ -346,7 +361,7 @@ const ParkingFees = () => {
                   </td>
                   <td className="px-4 py-3 text-sm">
                     <div className="flex items-center gap-2">
-                      {editingId === parkingFee.id ? (
+                      {editingId === parkingFee._id ? (
                         <>
                           <button
                             onClick={handleSaveEdit}
@@ -373,7 +388,7 @@ const ParkingFees = () => {
                             <Edit size={16} />
                           </button>
                           <button
-                            onClick={() => handleDelete(parkingFee.id)}
+                            onClick={() => handleDelete(parkingFee._id)}
                             className="p-1 text-red-600 hover:text-red-800 hover:bg-red-50 rounded transition-colors"
                             title="Delete"
                           >

@@ -1,20 +1,21 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { Edit, Trash2, Plus, X, Check } from 'lucide-react';
-
+import { DashBoardContext } from '../context/DashboardContext';
 const Vehicles = () => {
-  const [vehicles, setVehicles] = useState([
-    { id: 1, apartmentId: 'APT001', plateNumber: '30A-12345', vehicleType: 'Car', rfidTag: 'RFID001' },
-    { id: 2, apartmentId: 'APT002', plateNumber: '29B-67890', vehicleType: 'Motorcycle', rfidTag: 'RFID002' },
-    { id: 3, apartmentId: 'APT003', plateNumber: '30C-11111', vehicleType: 'Car', rfidTag: 'RFID003' },
-    { id: 4, apartmentId: 'APT001', plateNumber: '29D-22222', vehicleType: 'Motorcycle', rfidTag: 'RFID004' },
-    { id: 5, apartmentId: 'APT004', plateNumber: '30E-33333', vehicleType: 'Car', rfidTag: 'RFID005' },
-    { id: 6, apartmentId: 'APT002', plateNumber: '29F-44444', vehicleType: 'Bicycle', rfidTag: 'RFID006' },
-    { id: 7, apartmentId: 'APT005', plateNumber: '30G-55555', vehicleType: 'Car', rfidTag: 'RFID007' },
-    { id: 8, apartmentId: 'APT003', plateNumber: '29H-66666', vehicleType: 'Motorcycle', rfidTag: 'RFID008' },
-    { id: 9, apartmentId: 'APT006', plateNumber: '30I-77777', vehicleType: 'Car', rfidTag: 'RFID009' },
-    { id: 10, apartmentId: 'APT004', plateNumber: '29J-88888', vehicleType: 'Bicycle', rfidTag: 'RFID010' }
-  ]);
-
+  const {vehicleResident, updateVehicleById, deleteVehicleById, createVehicle, apartment} = useContext(DashBoardContext);
+  // const [vehicles, setVehicles] = useState([
+  //   { _id: 1, apartmentId: 'APT001', plateNumber: '30A-12345', vehicleType: 'Car', rfidTag: 'RFID001' },
+  //   { _id: 2, apartmentId: 'APT002', plateNumber: '29B-67890', vehicleType: 'Motorcycle', rfidTag: 'RFID002' },
+  //   { _id: 3, apartmentId: 'APT003', plateNumber: '30C-11111', vehicleType: 'Car', rfidTag: 'RFID003' },
+  //   { _id: 4, apartmentId: 'APT001', plateNumber: '29D-22222', vehicleType: 'Motorcycle', rfidTag: 'RFID004' },
+  //   { _id: 5, apartmentId: 'APT004', plateNumber: '30E-33333', vehicleType: 'Car', rfidTag: 'RFID005' },
+  //   { _id: 6, apartmentId: 'APT002', plateNumber: '29F-44444', vehicleType: 'Bicycle', rfidTag: 'RFID006' },
+  //   { _id: 7, apartmentId: 'APT005', plateNumber: '30G-55555', vehicleType: 'Car', rfidTag: 'RFID007' },
+  //   { _id: 8, apartmentId: 'APT003', plateNumber: '29H-66666', vehicleType: 'Motorcycle', rfidTag: 'RFID008' },
+  //   { _id: 9, apartmentId: 'APT006', plateNumber: '30I-77777', vehicleType: 'Car', rfidTag: 'RFID009' },
+  //   { _id: 10, apartmentId: 'APT004', plateNumber: '29J-88888', vehicleType: 'Bicycle', rfidTag: 'RFID010' }
+  // ]);
+  const [vehicles, setVehicles] = useState(vehicleResident);
   const [entriesPerPage, setEntriesPerPage] = useState(10);
   const [searchTerm, setSearchTerm] = useState('');
   const [sortConfig, setSortConfig] = useState({ key: null, direction: 'asc' });
@@ -28,9 +29,7 @@ const Vehicles = () => {
   const [addForm, setAddForm] = useState({ apartmentId: '', plateNumber: '', vehicleType: 'Car', rfidTag: '' });
 
   // Available apartment IDs (in real app, this would come from API)
-  const availableApartments = [
-    'APT001', 'APT002', 'APT003', 'APT004', 'APT005', 'APT006', 'APT007', 'APT008', 'APT009', 'APT010'
-  ];
+  const availableApartments = apartment.map(a => a._id);
 
   // Vehicle types
   const vehicleTypes = ['Car', 'Motorcycle', 'Bicycle', 'Truck', 'Van'];
@@ -73,7 +72,7 @@ const Vehicles = () => {
 
   // Edit functions
   const handleEdit = (vehicle) => {
-    setEditingId(vehicle.id);
+    setEditingId(vehicle._id);
     setEditForm({
       apartmentId: vehicle.apartmentId,
       plateNumber: vehicle.plateNumber,
@@ -85,7 +84,7 @@ const Vehicles = () => {
   const handleSaveEdit = () => {
     // Validation
     if (!editForm.apartmentId.trim()) {
-      alert('Please select an apartment ID');
+      alert('Please select an apartment _id');
       return;
     }
 
@@ -96,7 +95,7 @@ const Vehicles = () => {
 
     // Check if plate number already exists (excluding current record)
     const plateExists = vehicles.some(vehicle => 
-      vehicle.id !== editingId && 
+      vehicle._id !== editingId && 
       vehicle.plateNumber.toLowerCase() === editForm.plateNumber.trim().toLowerCase()
     );
     if (plateExists) {
@@ -107,7 +106,7 @@ const Vehicles = () => {
     // Check if RFID tag already exists (excluding current record and empty values)
     if (editForm.rfidTag.trim()) {
       const rfidExists = vehicles.some(vehicle => 
-        vehicle.id !== editingId && 
+        vehicle._id !== editingId && 
         vehicle.rfidTag.toLowerCase() === editForm.rfidTag.trim().toLowerCase()
       );
       if (rfidExists) {
@@ -117,7 +116,7 @@ const Vehicles = () => {
     }
 
     setVehicles(prev => prev.map(vehicle => 
-      vehicle.id === editingId 
+      vehicle._id === editingId 
         ? { 
             ...vehicle, 
             apartmentId: editForm.apartmentId.trim(),
@@ -127,10 +126,17 @@ const Vehicles = () => {
           }
         : vehicle
     ));
+    updateVehicleById({
+    _id: editingId,
+    apartmentId: editForm.apartmentId.trim(),
+    plateNumber: editForm.plateNumber.trim(),
+    vehicleType: editForm.vehicleType,
+    rfidTag: editForm.rfidTag.trim()
+    });
     setEditingId(null);
     setEditForm({ apartmentId: '', plateNumber: '', vehicleType: '', rfidTag: '' });
   };
-
+  
   const handleCancelEdit = () => {
     setEditingId(null);
     setEditForm({ apartmentId: '', plateNumber: '', vehicleType: '', rfidTag: '' });
@@ -159,7 +165,7 @@ const Vehicles = () => {
   const handleSaveNewVehicle = () => {
     // Validation
     if (!addForm.apartmentId.trim()) {
-      alert('Please select an apartment ID');
+      alert('Please select an apartment _id');
       return;
     }
 
@@ -189,15 +195,16 @@ const Vehicles = () => {
     }
 
     // Create new vehicle
-    const newId = vehicles.length > 0 ? Math.max(...vehicles.map(v => v.id)) + 1 : 1;
+    const newId = vehicles.length > 0 ? Math.max(...vehicles.map(v => v._id)) + 1 : 1;
+    console.log("leng:",vehicles.length);
     const newVehicle = {
-      id: newId,
+      // _id: newId,
       apartmentId: addForm.apartmentId.trim(),
       plateNumber: addForm.plateNumber.trim(),
       vehicleType: addForm.vehicleType,
       rfidTag: addForm.rfidTag.trim()
     };
-
+    createVehicle(newVehicle);
     // Add to vehicles list
     setVehicles(prev => [...prev, newVehicle]);
     
@@ -215,9 +222,10 @@ const Vehicles = () => {
   };
 
   // Delete function
-  const handleDelete = (id) => {
+  const handleDelete = (_id) => {
     if (window.confirm('Are you sure you want to delete this vehicle?')) {
-      setVehicles(prev => prev.filter(vehicle => vehicle.id !== id));
+      deleteVehicleById(_id);
+      setVehicles(prev => prev.filter(vehicle => vehicle._id !== _id));
     }
   };
 
@@ -277,7 +285,7 @@ const Vehicles = () => {
                   onClick={() => handleSort('apartmentId')}
                 >
                   <div className="flex items-center gap-1">
-                    Apartment ID
+                    Apartment _id
                     <span className="text-xs">{getSortIcon('apartmentId')}</span>
                   </div>
                 </th>
@@ -315,12 +323,12 @@ const Vehicles = () => {
             </thead>
             <tbody>
               {sortedVehicles.slice(0, entriesPerPage).map((vehicle, index) => (
-                <tr key={vehicle.id} className="hover:bg-gray-50 border-b border-gray-100">
+                <tr key={vehicle._id} className="hover:bg-gray-50 border-b border-gray-100">
                   <td className="px-4 py-3 text-sm text-gray-900">
                     {index + 1}
                   </td>
                   <td className="px-4 py-3 text-sm text-gray-900">
-                    {editingId === vehicle.id ? (
+                    {editingId === vehicle._id ? (
                       <select
                         value={editForm.apartmentId}
                         onChange={(e) => handleInputChange('apartmentId', e.target.value)}
@@ -328,17 +336,17 @@ const Vehicles = () => {
                       >
                         <option value="">Select Apartment</option>
                         {availableApartments.map(aptId => (
-                          <option key={aptId} value={aptId}>{aptId}</option>
+                          <option key={aptId} value={aptId}>{apartment.find(a => a._id === aptId)?.apartmentNumber}</option>
                         ))}
                       </select>
                     ) : (
                       <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded text-xs font-medium">
-                        {vehicle.apartmentId}
+                        {apartment.find(a => a._id === vehicle.apartmentId)?.apartmentNumber}
                       </span>
                     )}
                   </td>
                   <td className="px-4 py-3 text-sm text-gray-900">
-                    {editingId === vehicle.id ? (
+                    {editingId === vehicle._id ? (
                       <input
                         type="text"
                         value={editForm.plateNumber}
@@ -353,7 +361,7 @@ const Vehicles = () => {
                     )}
                   </td>
                   <td className="px-4 py-3 text-sm text-gray-900">
-                    {editingId === vehicle.id ? (
+                    {editingId === vehicle._id ? (
                       <select
                         value={editForm.vehicleType}
                         onChange={(e) => handleInputChange('vehicleType', e.target.value)}
@@ -375,7 +383,7 @@ const Vehicles = () => {
                     )}
                   </td>
                   <td className="px-4 py-3 text-sm text-gray-900">
-                    {editingId === vehicle.id ? (
+                    {editingId === vehicle._id ? (
                       <input
                         type="text"
                         value={editForm.rfidTag}
@@ -391,7 +399,7 @@ const Vehicles = () => {
                   </td>
                   <td className="px-4 py-3 text-sm">
                     <div className="flex items-center gap-2">
-                      {editingId === vehicle.id ? (
+                      {editingId === vehicle._id ? (
                         <>
                           <button
                             onClick={handleSaveEdit}
@@ -418,7 +426,7 @@ const Vehicles = () => {
                             <Edit size={16} />
                           </button>
                           <button
-                            onClick={() => handleDelete(vehicle.id)}
+                            onClick={() => handleDelete(vehicle._id)}
                             className="p-1 text-red-600 hover:text-red-800 hover:bg-red-50 rounded transition-colors"
                             title="Delete"
                           >
@@ -461,7 +469,7 @@ const Vehicles = () => {
               <div className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Apartment ID <span className="text-red-500">*</span>
+                    Apartment Id <span className="text-red-500">*</span>
                   </label>
                   <select
                     value={addForm.apartmentId}
@@ -470,7 +478,7 @@ const Vehicles = () => {
                   >
                     <option value="">Select an apartment</option>
                     {availableApartments.map(aptId => (
-                      <option key={aptId} value={aptId}>{aptId}</option>
+                      <option key={aptId} value={aptId}>{apartment.find(a => a._id === aptId)?.apartmentNumber}</option>
                     ))}
                   </select>
                 </div>
@@ -521,7 +529,7 @@ const Vehicles = () => {
               <div className="flex gap-3 mt-6">
                 <button
                   onClick={handleSaveNewVehicle}
-                  className="flex-1 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md transition-colors flex items-center justify-center gap-2 font-medium"
+                  className="mt-4 flex-1 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md transition-colors flex items-center justify-center gap-2 font-medium"
                 >
                   <Check size={16} />
                   Add Vehicle
@@ -529,7 +537,7 @@ const Vehicles = () => {
             
                 <button
                   onClick={handleCancelAdd}
-                  className="flex-1 bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-md transition-colors flex items-center justify-center gap-2 font-medium"
+                  className="mt-4 flex-1 bg-blue-500 hover:bg-gray-600 text-white px-4 py-2 rounded-md transition-colors flex items-center justify-center gap-2 font-medium"
                 >
                   <X size={16} />
                   Cancel

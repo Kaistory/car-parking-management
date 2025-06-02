@@ -20,18 +20,19 @@ mongoose.connect(URI, { useNewUrlParser: true,useUnifiedTopology: true })
 .then(() =>console.log("Connected to MongoDB"))
         .catch(err => console.log("Error connecting to MongoDB"));
 // Initialize MQTT controller
-const {mqttController,openDoor, closeDoor} = require('./Mqtt-controller');
+// const {mqttController,openDoor, closeDoor} = require('./Mqtt-controller');
 
-mqttController();
+// mqttController();
+// app.use("/door/open",openDoor);
+// app.use("/door/close",closeDoor);
 
 // Middleware
 app.use(cors());
 app.use(express.json());
-app.use("/door/open",openDoor);
-app.use("/door/close",closeDoor);
+
 app.use("/api/users",userRoute);
 app.use("/api/apartments", apartmentRoute);
-app.use("/api/resident-vehicles",residentRoute);
+app.use("/api/vehicles/resident",residentRoute);
 app.use("/api/parking",parkingRoute);
 // Define a route
 app.get('/', (req, res) => {

@@ -5,7 +5,7 @@ const {createResidentVehicle,getAllResidentVehicles,getResidentVehicleById,updat
 router.get('/', getAllResidentVehicles);
 router.post('/register/', createResidentVehicle);
 router.get('/:id', getResidentVehicleById);
-router.put('/:id', updateResidentVehicle);
-router.delete('/:id', deleteResidentVehicle);
+router.post('/update/:id', updateResidentVehicle);
+router.post('/delete/:id', deleteResidentVehicle);
 
 module.exports = router;

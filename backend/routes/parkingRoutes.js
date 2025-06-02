@@ -9,8 +9,8 @@ const router = express.Router();
 
 router.get("/fees", getAllParkingFees);
 router.post("/fees", createParkingFee);
-router.put("/fees/:id", updateParkingFee);
-router.delete("/fees/:id", deleteParkingFee);
+router.post("/fees/update/:id", updateParkingFee);
+router.post("/fees/delete/:id", deleteParkingFee);
 
 router.get("/records", getAllParkingRecords);
 router.post("/records", createParkingRecord);
