@@ -1,6 +1,8 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { Edit, Trash2, Plus, X, Check } from 'lucide-react';
 import { DashBoardContext } from '../context/DashboardContext';
+import { baseUrl, getRequest, postRequest } from "../utils/services";
+
 // Thay vehicle id thanh bang hien bien so xe
 const ParkingRecords = () => {
   const {recordsParking} = useContext(DashBoardContext);
@@ -9,7 +11,18 @@ const ParkingRecords = () => {
   const [entriesPerPage, setEntriesPerPage] = useState(10);
   const [searchTerm, setSearchTerm] = useState('');
   const [sortConfig, setSortConfig] = useState({ key: null, direction: 'asc' });
-  
+  // demo auto update
+  useEffect(() => {
+    const fetchInfo = async () => {
+                const response3 = await getRequest(`${baseUrl}/parking/records`);  
+                    if (response3.error) {
+                        return console.error("Failed to fetch recordsParking");
+                    } 
+                    setParkingRecords(response3);
+                }
+            fetchInfo();
+    setParkingRecords(recordsParking);
+  }, [recordsParking]);
   // Edit states
   const [editingId, setEditingId] = useState(null);
   const [editForm, setEditForm] = useState({ 
