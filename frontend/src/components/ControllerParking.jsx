@@ -1,9 +1,43 @@
-import React, { useState } from 'react';
-import { Camera, Clock, DollarSign, User, Car } from 'lucide-react';
-
+import React, { useState, useContext } from 'react';
+import { Camera,  DollarSign,  Car } from 'lucide-react';
+import {getRequest} from "../utils/services";
+import { DashBoardContext } from '../context/DashboardContext';
 const ControllerParking = () => {
-  const [currentTime] = useState(new Date().toLocaleString('vi-VN'));
-  
+  const { recordsParking } = useContext(DashBoardContext);
+  const getMaxTimeRecord = (records) => {
+  if (!records || records.length === 0) return null;
+  return records.reduce((max, record) => {
+    const recordTime = new Date(record.exitTime || record.entryTime).getTime();
+    const maxTime = new Date(max.exitTime || max.entryTime).getTime();
+    return recordTime > maxTime ? record : max;
+  }, records[0]);
+};
+
+function formatDateTime(dateString) {
+  if (!dateString) return '';
+  const date = new Date(dateString);
+  const pad = (n) => n.toString().padStart(2, '0');
+  return `${pad(date.getDate())}/${pad(date.getMonth() + 1)}/${date.getFullYear()} - ${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`;
+}
+// Sử dụng:
+const latestRecord = getMaxTimeRecord(recordsParking);
+console.log(latestRecord);
+
+  const openFunction = async () => {
+    const response = await getRequest(`http://localhost:8000/door/open`);
+    if (response.error) {
+      return console.error("Failed to fetch apartment");
+    }
+    console.log("Cửa đã mở thành công");
+  };
+  const closeFunction = async () => {
+    const response = await getRequest(`http://localhost:8000/door/close`);        
+                if (response.error) {
+                    return console.error("Failed to fetch apartment");
+                } 
+    
+  }
+
   return (
     <div className="min-h-screen bg-gray-100 p-4">
       <div className="max-w-5xl mx-auto">
@@ -64,11 +98,11 @@ const ControllerParking = () => {
                 </div>
                 <div className="flex justify-between items-center mb-2">
                   <span className="text-gray-600">Thời gian vào:</span>
-                  <span className="font-medium">26/05/2025 - 08:15:00</span>
+                  <span className="font-medium">{formatDateTime(latestRecord.entryTime)}</span>
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="text-gray-600">Thời gian ra:</span>
-                  <span className="font-medium">26/05/2025 - 11:30:00</span>
+                  <span className="font-medium">{formatDateTime(latestRecord.exitTime)}</span>
                 </div>
               </div>
 
@@ -85,10 +119,14 @@ const ControllerParking = () => {
 
               {/* Action Buttons */}
               <div className="grid grid-cols-2 gap-3">
-                <button className="bg-green-500 hover:bg-green-500 text-white px-4 py-2 rounded-lg font-medium transition-colors">
+                <button 
+                onClick={openFunction}
+                className="bg-green-500 hover:bg-green-500 text-white px-4 py-2 rounded-lg font-medium transition-colors">
                   Open
                 </button>
-                <button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors">
+                <button 
+                onClick={closeFunction}
+                className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors">
                   Close
                 </button>
               </div>

@@ -12,10 +12,10 @@ const SideBar = () =>{
     { icon: Calendar, label: 'Parking Records' },
     // { icon: Clock, label: 'Real Time Parking' },
     { icon: Coins, label: 'Parking Fees' },
-    { icon: HandCoins, label: 'Parking Payments' },
+    // { icon: HandCoins, label: 'Parking Payments' },
     { icon: Monitor, label: 'Controller Parking' },
     { icon: Mail, label: 'Mail' },
-    { icon: Grid, label: 'Widgets' },
+    // { icon: Grid, label: 'Widgets' },
     ];
     
     return(

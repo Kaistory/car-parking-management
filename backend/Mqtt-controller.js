@@ -80,7 +80,7 @@ const openDoor = () =>{
   var client = mqtt.connect(options);
 
   client.on('connect', function () {
-    console.log('Connected to MQTT broker');
+    console.log('Opened door');
     client.publish('esp8266/client', '{"message":"open"}');
     client.end();
   });
@@ -96,7 +96,7 @@ const closeDoor = () =>{
   var client = mqtt.connect(options);
 
   client.on('connect', function () {
-    console.log('Connected to MQTT broker');
+    console.log('Closed door');
     client.publish('esp8266/client', '{"message":"clos"}');
     client.end();
   });

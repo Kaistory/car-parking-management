@@ -1,7 +1,7 @@
 import React, { useContext, useState } from 'react';
 import { Edit, Trash2, Plus, X, Check } from 'lucide-react';
 import { DashBoardContext } from '../context/DashboardContext';
-
+// Thay vehicle id thanh bang hien bien so xe
 const ParkingRecords = () => {
   const {recordsParking} = useContext(DashBoardContext);
   
