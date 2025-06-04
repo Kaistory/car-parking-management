@@ -12,16 +12,12 @@ export const DashBoardContextProvider = ({ children, user }) =>{
     const [recordsParking, setRecordsParking] = useState([]);
     const [feesParking, setFeesParking] = useState([]);
     // useEffect(() => {
-    //     if (user) {
-    //         const newSocket = io(import.meta.env.VITE_SOCKET_URL, {
-    //             query: { userId: user._id },
-    //         });
-    //         setSocket(newSocket);
-    //         return () => {
-    //             newSocket.disconnect();
-    //         };
-    //     }
-    // }, [user]);
+//   const socket = io('http://localhost:8000');
+//   socket.on('newParkingRecord', (newRecord) => {
+//     setRecordsParking(prev => [newRecord, ...prev]);
+//   });
+//   return () => socket.disconnect();
+// }, []);
     useEffect(() => {
         setApartment(apartment);
         setVehicleResident(vehicleResident);
@@ -31,7 +27,8 @@ export const DashBoardContextProvider = ({ children, user }) =>{
     
     useEffect(() => {
         const fetchInfo = async () => {
-            const response = await getRequest(`${baseUrl}/apartments`);        
+            const response = await getRequest(`${baseUrl}/apartments`);  
+                //   console.log(apartment);
                 if (response.error) {
                     return console.error("Failed to fetch apartment");
                 } 
@@ -53,7 +50,7 @@ export const DashBoardContextProvider = ({ children, user }) =>{
                 setFeesParking(response4);
             }
         fetchInfo();
-    }, []);
+    }, [apartment]);
 
     const updateActiveItem = useCallback((item) =>{
         setActiveItem(item);

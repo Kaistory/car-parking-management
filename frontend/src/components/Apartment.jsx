@@ -1,4 +1,4 @@
-import React, { useState , useContext} from 'react';
+import React, { useState , useContext, useEffect} from 'react';
 import { Edit, Trash2, Plus, X, Check } from 'lucide-react';
 import { DashBoardContext } from '../context/DashboardContext'
 
@@ -187,8 +187,6 @@ const Resident = () => {
       area: parseInt(addForm.area)
     };
     createApartment(newApartment);
-    // Add to apartments list
-    setApartments(prev => [...prev, newApartment]);
     
     // Close modal and reset form
     setShowAddModal(false);
@@ -210,6 +208,10 @@ const Resident = () => {
       setApartments(prev => prev.filter(apt => apt._id !== _id));    
     }
   };
+  // useEffect to update apartments from context
+  useEffect(() => {
+    setApartments(apartment);
+  }, [apartment]);
 
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
