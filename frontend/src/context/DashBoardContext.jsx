@@ -11,13 +11,6 @@ export const DashBoardContextProvider = ({ children, user }) =>{
     const [vehicleResident, setVehicleResident] = useState([]);
     const [recordsParking, setRecordsParking] = useState([]);
     const [feesParking, setFeesParking] = useState([]);
-    // useEffect(() => {
-//   const socket = io('http://localhost:8000');
-//   socket.on('newParkingRecord', (newRecord) => {
-//     setRecordsParking(prev => [newRecord, ...prev]);
-//   });
-//   return () => socket.disconnect();
-// }, []);
     useEffect(() => {
         setApartment(apartment);
         setVehicleResident(vehicleResident);

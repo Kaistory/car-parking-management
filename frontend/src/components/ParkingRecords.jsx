@@ -5,7 +5,7 @@ import { baseUrl, getRequest, postRequest } from "../utils/services";
 
 // Thay vehicle id thanh bang hien bien so xe
 const ParkingRecords = () => {
-  const {recordsParking, updateRecordById, deleteRecordById} = useContext(DashBoardContext);
+  const {vehicleResident, updateRecordById, deleteRecordById} = useContext(DashBoardContext);
 
   const [parkingRecords, setParkingRecords] = useState([]);
   const [entriesPerPage, setEntriesPerPage] = useState(10);
@@ -66,7 +66,7 @@ const ParkingRecords = () => {
 
   // Filter parking records based on search term
   const filteredRecords = parkingRecords.filter(record => {
-    const vehicleIdStr = record.vehicleId || 'N/A';
+    const vehicleIdStr = vehicleResident.find(v => v._id === record.vehicleId)?.plateNumber || 'N/A';
     return vehicleIdStr.toLowerCase().includes(searchTerm.toLowerCase()) ||
       record.vehicleModel.toLowerCase().includes(searchTerm.toLowerCase()) ||
       record.status.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -348,7 +348,7 @@ const ParkingRecords = () => {
                       />
                     ) : (
                       <span className={`font-mono text-xs ${record.vehicleId ? '' : 'text-gray-400 italic'}`}>
-                        {record.vehicleId || 'N/A'}
+                        {vehicleResident.find(v => v._id === record.vehicleId).plateNumber || 'N/A'}
                       </span>
                     )}
                   </td>

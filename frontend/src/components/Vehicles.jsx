@@ -32,7 +32,7 @@ const Vehicles = () => {
   const availableApartments = apartment.map(a => a._id);
 
   // Vehicle types
-  const vehicleTypes = ['Car', 'Motorcycle', 'Bicycle', 'Truck', 'Van'];
+  const vehicleTypes = ['Car', 'Motorbike', 'Bicycle', 'Truck', 'Van'];
 
   // Filter vehicles based on search term
   const filteredVehicles = vehicles.filter(vehicle =>
@@ -374,7 +374,7 @@ const Vehicles = () => {
                     ) : (
                       <span className={`px-2 py-1 rounded-full text-xs font-medium ${
                         vehicle.vehicleType === 'Car' ? 'bg-green-100 text-green-800' :
-                        vehicle.vehicleType === 'Motorcycle' ? 'bg-orange-100 text-orange-800' :
+                        vehicle.vehicleType === 'Motorbike' ? 'bg-orange-100 text-orange-800' :
                         vehicle.vehicleType === 'Bicycle' ? 'bg-purple-100 text-purple-800' :
                         'bg-gray-100 text-gray-800'
                       }`}>
