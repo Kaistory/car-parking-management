@@ -11,17 +11,54 @@ export const DashBoardContextProvider = ({ children, user }) =>{
     const [vehicleResident, setVehicleResident] = useState([]);
     const [recordsParking, setRecordsParking] = useState([]);
     const [feesParking, setFeesParking] = useState([]);
+    const [trafficData, setTrafficData] = useState([]);
+    
+    function getMonthName(Time) {
+      if (!Time) return '';
+      const date = new Date(Time);
+      const monthNames = [
+        'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+        'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+    ];
+      return monthNames[date.getMonth()];
+    }
+    const makeTrafficData = (vR,rP) => {
+        const data = [
+    { name: 'Jan', car: 0, motobike: 0, bike: 0, all: 0 },
+    { name: 'Feb', car: 0, motobike: 0, bike: 0, all: 0 },
+    { name: 'Mar', car: 0, motobike: 0, bike: 0, all: 0 },
+    { name: 'Apr', car: 0, motobike: 0, bike: 0, all: 0 },
+    { name: 'May', car: 0, motobike: 0, bike: 0, all: 0 },
+    { name: 'Jun', car: 0, motobike: 0, bike: 0, all: 0 },
+    { name: 'Jul', car: 0, motobike: 0, bike: 0, all: 0 },
+    { name: 'Aug', car: 0, motobike: 0, bike: 0, all: 0 },
+    { name: 'Sep', car: 0, motobike: 0, bike: 0, all: 0 },
+    { name: 'Oct', car: 0, motobike: 0, bike: 0, all: 0 },
+    { name: 'Nov', car: 0, motobike: 0, bike: 0, all: 0 },
+    { name: 'Dec', car: 0, motobike: 0, bike: 0, all: 0 },
+    ];
+        data.forEach((month) => {
+            month.car = rP.filter(record => getMonthName(record.entryTime) == month.name && vehicleResident.some(v => v._id === record.vehicleId && v.vehicleType === "Car")).length;
+            month.motobike = rP.filter(record => getMonthName(record.entryTime) == month.name && vehicleResident.some(v => v._id === record.vehicleId && v.vehicleType === "Motorbike")).length;
+            month.bike = rP.filter(record => getMonthName(record.entryTime) == month.name && vehicleResident.some(v => v._id === record.vehicleId && v.vehicleType === "Bike")).length;
+            month.all = rP.filter(record => getMonthName(record.entryTime) == month.name).length;
+        })
+        return data;
+    };
+
     useEffect(() => {
         setApartment(apartment);
         setVehicleResident(vehicleResident);
         setRecordsParking(recordsParking);
-        setFeesParking(feesParking)
-    }, [apartment, vehicleResident, recordsParking,feesParking]);
-    
+        setFeesParking(feesParking);
+        setTrafficData(makeTrafficData(vehicleResident,recordsParking));
+        const act = localStorage.getItem("activeItem");
+        setActiveItem(act ? act : 'Dashboard');
+    }, [apartment, vehicleResident, recordsParking, feesParking]);
+
     useEffect(() => {
         const fetchInfo = async () => {
             const response = await getRequest(`${baseUrl}/apartments`);  
-                //   console.log(apartment);
                 if (response.error) {
                     return console.error("Failed to fetch apartment");
                 } 
@@ -43,9 +80,10 @@ export const DashBoardContextProvider = ({ children, user }) =>{
                 setFeesParking(response4);
             }
         fetchInfo();
-    }, [apartment]);
+    }, []);
 
     const updateActiveItem = useCallback((item) =>{
+        localStorage.setItem("activeItem", item);
         setActiveItem(item);
     },[]);
     const updateRecordById = useCallback(async (newRecord) => {
@@ -179,6 +217,7 @@ export const DashBoardContextProvider = ({ children, user }) =>{
         createFee,
         updateRecordById,
         deleteRecordById,
+        trafficData
     }}>{children}
     </DashBoardContext.Provider>
 }

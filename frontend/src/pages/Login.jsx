@@ -15,7 +15,7 @@ const Login = () => {
   const { loginUser , loginError, loginInfo, updateLoginInfo, isLoginLoading } = useContext(AuthContext);
   
   return (
-    <Form onSubmit= {loginUser} className="login-main">
+    <Form className="login-main">
       <Col className="login-left">
         <img src={Image} alt="" />
       </Col>
@@ -69,8 +69,8 @@ const Login = () => {
                 </a>
               </Col>
               <Col className="login-center-buttons">
-                <Button variant="primary" type="submit">{isLoginLoading ? "Getting you in..." : "Login"}</Button>
-                <Button variant="primary" type="submit">
+                <Button variant="primary" type="submit" onClick={loginUser}>{isLoginLoading ? "Getting you in..." : "Login"}</Button>
+                <Button variant="primary" type="submit" onClick={1}>
                   <img src={GoogleSvg} alt="" />
                   Log In with Google
                 </Button>

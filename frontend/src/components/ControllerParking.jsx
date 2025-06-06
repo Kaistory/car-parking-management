@@ -1,18 +1,21 @@
 import React, { useState, useContext,useEffect } from 'react';
 import { Camera,  DollarSign,  Car } from 'lucide-react';
 import {getRequest,baseUrl} from "../utils/services";
+import { DashBoardContext } from "../context/DashBoardContext";
 const ControllerParking = () => {
-  const [recordsParking, setRecordsParking] = useState([]);
+  const {vehicleResident} = useContext(DashBoardContext);
+  const [recordsParking, setRecordsParking] = useState(null);
+  const [vehicleInfo, setVehicleInfo] = useState(null);
   useEffect(() => {
       const fetchInfo = async () => {
                   const response3 = await getRequest(`${baseUrl}/parking/records`);  
                       if (response3.error) {
                           return console.error("Failed to fetch recordsParking");
                       } 
-                      setRecordsParking(response3);
+                      setRecordsParking(response3[0]);
+                      setVehicleInfo(vehicleResident.find(vehicle => vehicle._id === response3[0].vehicleId));
                   }
               fetchInfo();
-              // console.log(recordsParking[0].entryTime);
     }, [recordsParking]);
 
 function formatDateTime(dateString) {
@@ -62,7 +65,9 @@ function formatDateTime(dateString) {
                 </div>
                 {/* License Plate Overlay */}
                 <div className="absolute bottom-2 left-2 bg-yellow-400 text-black px-2 py-1 rounded text-sm font-bold">
-                  54-V5 2426
+                  {
+                    vehicleInfo?.plateNumber
+                  }
                 </div>
               </div>
               
@@ -89,25 +94,29 @@ function formatDateTime(dateString) {
               <div className="bg-gray-50 rounded-lg p-4">
                 <div className="flex justify-between items-center mb-2">
                   <span className="text-gray-600">Biển số xe:</span>
-                  <span className="font-bold text-lg">54-V5-2426</span>
+                  <span className="font-bold text-lg">{
+                    vehicleInfo?.plateNumber
+                  }</span>
                 </div>
                 <div className="flex justify-between items-center mb-2">
                   <span className="text-gray-600">Loại xe:</span>
-                  <span className="font-medium">Xe Máy</span>
+                  <span className="font-medium">{
+                    vehicleInfo?.vehicleType
+                  }</span>  
                 </div>
                 <div className="flex justify-between items-center mb-2">
                   <span className="text-gray-600">Thời gian vào:</span>
                   <span className="font-medium">{
-                    recordsParking[0] && recordsParking[0].entryTime
-                      ? formatDateTime(recordsParking[0].entryTime)
-                      : ''
+                    recordsParking && recordsParking.entryTime
+                      ? formatDateTime(recordsParking.entryTime)
+                      : 'Chưa vào'
                   }</span>
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="text-gray-600">Thời gian ra:</span>
                   <span className="font-medium">{
-                    recordsParking[0] && recordsParking[0].exitTime
-                      ? formatDateTime(recordsParking[0].exitTime)
+                    recordsParking && recordsParking.exitTime
+                      ? formatDateTime(recordsParking.exitTime)
                       : 'Chưa ra'
                   }</span>
                 </div>

@@ -1,6 +1,6 @@
-import StatsCards from '../components/StatsCards';
+import StatsCards from './DashBoard/StatsCards';
 import MediaStats from "../components/MediaStats";
-import TrafficChart from '../components/TrafficChart';
+import TrafficChart from '../components/DashBoard/TrafficChart';
 
 const MainContent = () =>{
 return (<main className="flex-1 overflow-y-auto p-6">

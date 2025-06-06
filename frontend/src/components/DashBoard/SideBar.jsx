@@ -1,6 +1,6 @@
 import { Home, Users, Car, HandCoins, Calendar, Mail, Archive, Clock, Coins, Monitor, Grid, TrendingUp, TrendingDown, Facebook, Twitter, Linkedin, Bell, Search, MessageSquare } from 'lucide-react';
 import React, { useState, useContext } from 'react';
-import { DashBoardContext } from '../context/DashboardContext';
+import { DashBoardContext } from '../../context/DashboardContext';
 
 const SideBar = () =>{
     const {activeItem, updateActiveItem} = useContext(DashBoardContext);

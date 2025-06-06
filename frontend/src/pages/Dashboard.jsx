@@ -1,5 +1,5 @@
 import MainContent from "../components/MainContent";
-import SideBar from '../components/SideBar';
+import SideBar from '../components/DashBoard/SideBar';
 import Header from '../components/Header';
 import { useContext } from "react";
 import { DashBoardContext } from "../context/DashboardContext";

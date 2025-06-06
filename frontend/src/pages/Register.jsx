@@ -47,7 +47,7 @@ const Register = () => {
       if (otp === "123456") {
         // Giả lập OTP đúng
         alert("Đăng ký thành công!");
-        // Có thể chuyển hướng sang trang đăng nhập ở đây
+        navigate("/login");
       } else {
         setOtpError("Mã OTP không đúng. Vui lòng thử lại.");
       }

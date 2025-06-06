@@ -1,16 +1,9 @@
+import { useContext, useEffect} from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, ResponsiveContainer } from 'recharts';
-
+import { DashBoardContext } from '../../context/DashboardContext';  
 const TrafficChart = () =>{
-    const trafficData = [
-    { name: 'Jan', car: 20, motobike: 15, bike: 25, all: 30 },
-    { name: 'Feb', car: 25, motobike: 20, bike: 20, all: 35 },
-    { name: 'Mar', car: 15, motobike: 10, bike: 30, all: 25 },
-    { name: 'Apr', car: 30, motobike: 25, bike: 35, all: 40 },
-    { name: 'May', car: 35, motobike: 30, bike: 25, all: 45 },
-    { name: 'Jun', car: 40, motobike: 35, bike: 40, all: 50 },
-    { name: 'Jul', car: 45, motobike: 40, bike: 35, all: 55 },
-    ];
-
+    
+    const {trafficData} = useContext(DashBoardContext);
     return (
         <div className="lg:col-span-2 bg-white rounded-lg shadow p-6">
               <div className="flex items-center justify-between mb-6">
