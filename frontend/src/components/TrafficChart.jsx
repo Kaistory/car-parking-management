@@ -16,9 +16,9 @@ const TrafficChart = () =>{
               <div className="flex items-center justify-between mb-6">
                 <h3 className="text-lg font-semibold text-gray-800">Traffic</h3>
                 <div className="flex space-x-2">
-                  <button className="px-3 py-1 text-xs bg-gray-200 text-gray-600 rounded">Day</button>
+                  {/* <button className="px-3 py-1 text-xs bg-gray-200 text-gray-600 rounded">Day</button> */}
                   <button className="px-3 py-1 text-xs bg-blue-100 text-blue-600 rounded">Month</button>
-                  <button className="px-3 py-1 text-xs bg-gray-200 text-gray-600 rounded">Year</button>
+                  {/* <button className="px-3 py-1 text-xs bg-gray-200 text-gray-600 rounded">Year</button> */}
                 </div>
               </div>
               

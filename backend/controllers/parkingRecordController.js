@@ -5,7 +5,7 @@ const ParkingRecord = require('../models/ParkingRecord');
 const getAllParkingRecords = async (req, res) => {
   try {
     const records = await ParkingRecord.find()
-      .populate('vehicleId') // Tham chiếu đến xe cư dân hoặc xe khách
+      // .populate('vehicleId') // Tham chiếu đến xe cư dân hoặc xe khách
       .sort({ entryTime: -1 });
     res.status(200).json(records);
   } catch (error) {
@@ -39,4 +39,28 @@ const getParkingRecordById = async (req, res) => {
   }
 };
 
-module.exports = {getAllParkingRecords,createParkingRecord, getParkingRecordById}
+const updateParkingRecord = async (req, res) => {
+  try {
+    const updatedRecord = await ParkingRecord.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    if (!updatedRecord) {
+      return res.status(404).json({ message: 'Không tìm thấy lượt vào/ra để cập nhật' });
+    }
+    res.status(200).json(updatedRecord);
+  } catch (error) {
+    res.status(500).json({ message: 'Lỗi khi cập nhật lượt vào/ra', error });
+  }
+};
+
+const deleteParkingRecord = async (req, res) => {
+  try {
+    const deletedRecord = await ParkingRecord.findByIdAndDelete(req.params.id);
+    if (!deletedRecord) {
+      return res.status(404).json({ message: 'Không tìm thấy lượt vào/ra để xóa' });
+    }
+    res.status(200).json({ message: 'Xóa lượt vào/ra thành công' });
+  } catch (error) {
+    res.status(500).json({ message: 'Lỗi khi xóa lượt vào/ra', error });
+  }
+};
+
+module.exports = {getAllParkingRecords,createParkingRecord, getParkingRecordById, updateParkingRecord, deleteParkingRecord}

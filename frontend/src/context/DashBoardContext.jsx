@@ -55,6 +55,28 @@ export const DashBoardContextProvider = ({ children, user }) =>{
     const updateActiveItem = useCallback((item) =>{
         setActiveItem(item);
     },[]);
+    const updateRecordById = useCallback(async (newRecord) => {
+        const response = await postRequest(`${baseUrl}/parking/records/update/${newRecord._id}`, JSON.stringify(newRecord));
+        console.log(newRecord);
+        if (response.error) {
+            return console.error("Failed to update recordsParking");
+        }
+        setRecordsParking((prevRecords) => {
+            return prevRecords.map((record) =>
+                record._id === newRecord._id ? newRecord : record
+            );
+        });
+    }, []);
+
+    const deleteRecordById = useCallback(async (recordId) => {
+        const response = await postRequest(`${baseUrl}/parking/records/delete/${recordId}`);
+        if (response.error) {
+            return console.error("Failed to delete recordsParking");
+        }
+        setRecordsParking((prevRecords) => {
+            return prevRecords.filter((record) => record._id !== recordId);
+        });
+    }, []);
 
     const updateFeeById = useCallback(async (newFee) => {
         const response = await postRequest(`${baseUrl}/parking/fees/update/${newFee._id}`, JSON.stringify(newFee));
@@ -161,7 +183,9 @@ export const DashBoardContextProvider = ({ children, user }) =>{
         feesParking,
         updateFeeById,
         deleteFeeById,
-        createFee
+        createFee,
+        updateRecordById,
+        deleteRecordById,
     }}>{children}
     </DashBoardContext.Provider>
 }

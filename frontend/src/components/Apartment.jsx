@@ -4,21 +4,6 @@ import { DashBoardContext } from '../context/DashboardContext'
 
 const Resident = () => {
   const {apartment, updateApartmentById,deleteApartmentById,createApartment} = useContext(DashBoardContext);
-  // const [apartments, setApartments] = useState([
-  //   { _id: 1, ownerName: 'Nguyễn Văn An', apartmentNumber: '201', floor: 2, area: 75 },
-  //   { _id: 2, ownerName: 'Trần Thị Bình', apartmentNumber: '269', floor: 2, area: 68 },
-  //   { _id: 3, ownerName: 'Lê Minh Cường', apartmentNumber: '333', floor: 3, area: 85 },
-  //   { _id: 4, ownerName: 'Phạm Thị Dung', apartmentNumber: '69', floor: 6, area: 72 },
-  //   { _id: 5, ownerName: '', apartmentNumber: '255', floor: 2, area: 65 },
-  //   { _id: 6, ownerName: '', apartmentNumber: '86', floor: 8, area: 90 },
-  //   { _id: 7, ownerName: '', apartmentNumber: '179', floor: 1, area: 58 },
-  //   { _id: 8, ownerName: 'Hoàng Văn Em', apartmentNumber: '321', floor: 3, area: 78 },
-  //   { _id: 9, ownerName: 'Võ Thị Phương', apartmentNumber: '203', floor: 2, area: 82 },
-  //   { _id: 10, ownerName: 'Đặng Minh Giang', apartmentNumber: '888', floor: 8, area: 95 },
-  //   { _id: 11, ownerName: 'Bùi Thị Hương', apartmentNumber: '170', floor: 1, area: 55 },
-  //   { _id: 12, ownerName: '', apartmentNumber: '401', floor: 4, area: 88 },
-  //   { _id: 13, ownerName: 'Ngô Văn Hùng', apartmentNumber: '444', floor: 4, area: 70 }
-  // ]);
   const [apartments, setApartments] = useState(apartment);
   const [entriesPerPage, setEntriesPerPage] = useState(10);
   const [searchTerm, setSearchTerm] = useState('');

@@ -5,9 +5,9 @@ import { baseUrl, getRequest, postRequest } from "../utils/services";
 
 // Thay vehicle id thanh bang hien bien so xe
 const ParkingRecords = () => {
-  const {recordsParking} = useContext(DashBoardContext);
-  
-  const [parkingRecords, setParkingRecords] = useState(recordsParking);
+  const {recordsParking, updateRecordById, deleteRecordById} = useContext(DashBoardContext);
+
+  const [parkingRecords, setParkingRecords] = useState([]);
   const [entriesPerPage, setEntriesPerPage] = useState(10);
   const [searchTerm, setSearchTerm] = useState('');
   const [sortConfig, setSortConfig] = useState({ key: null, direction: 'asc' });
@@ -21,8 +21,7 @@ const ParkingRecords = () => {
                     setParkingRecords(response3);
                 }
             fetchInfo();
-    setParkingRecords(recordsParking);
-  }, [recordsParking]);
+  }, [parkingRecords]);
   // Edit states
   const [editingId, setEditingId] = useState(null);
   const [editForm, setEditForm] = useState({ 
@@ -138,18 +137,15 @@ const ParkingRecords = () => {
       return;
     }
 
-    setParkingRecords(prev => prev.map(record => 
-      record._id === editingId 
-        ? { 
-            ...record, 
-            vehicleId: editForm.vehicleId.trim() || null,
-            vehicleModel: editForm.vehicleModel,
-            entryTime: editForm.entryTime,
-            exitTime: editForm.exitTime || null,
-            status: editForm.status
-          }
-        : record
-    ));
+    
+    updateRecordById({
+      _id: editingId,
+      vehicleId: editForm.vehicleId.trim() || null,
+      vehicleModel: editForm.vehicleModel,
+      entryTime: editForm.entryTime,
+      exitTime: editForm.exitTime || null,
+      status: editForm.status
+    });
     setEditingId(null);
     setEditForm({ vehicleId: '', vehicleModel: 'ResidentVehicle', entryTime: '', exitTime: '', status: 'IN' });
   };
@@ -227,7 +223,7 @@ const ParkingRecords = () => {
   // Delete function
   const handleDelete = (_id) => {
     if (window.confirm('Are you sure you want to delete this parking record?')) {
-      setParkingRecords(prev => prev.filter(record => record._id !== _id));
+      deleteRecordById(_id);
     }
   };
 

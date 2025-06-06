@@ -1,17 +1,19 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext,useEffect } from 'react';
 import { Camera,  DollarSign,  Car } from 'lucide-react';
-import {getRequest} from "../utils/services";
-import { DashBoardContext } from '../context/DashboardContext';
+import {getRequest,baseUrl} from "../utils/services";
 const ControllerParking = () => {
-  const { recordsParking } = useContext(DashBoardContext);
-  const getMaxTimeRecord = (records) => {
-  if (!records || records.length === 0) return null;
-  return records.reduce((max, record) => {
-    const recordTime = new Date(record.exitTime || record.entryTime).getTime();
-    const maxTime = new Date(max.exitTime || max.entryTime).getTime();
-    return recordTime > maxTime ? record : max;
-  }, records[0]);
-};
+  const [recordsParking, setRecordsParking] = useState([]);
+  useEffect(() => {
+      const fetchInfo = async () => {
+                  const response3 = await getRequest(`${baseUrl}/parking/records`);  
+                      if (response3.error) {
+                          return console.error("Failed to fetch recordsParking");
+                      } 
+                      setRecordsParking(response3);
+                  }
+              fetchInfo();
+              // console.log(recordsParking[0].entryTime);
+    }, [recordsParking]);
 
 function formatDateTime(dateString) {
   if (!dateString) return '';
@@ -19,9 +21,6 @@ function formatDateTime(dateString) {
   const pad = (n) => n.toString().padStart(2, '0');
   return `${pad(date.getDate())}/${pad(date.getMonth() + 1)}/${date.getFullYear()} - ${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`;
 }
-// Sử dụng:
-const latestRecord = getMaxTimeRecord(recordsParking);
-console.log(latestRecord);
 
   const openFunction = async () => {
     const response = await getRequest(`http://localhost:8000/door/open`);
@@ -98,11 +97,19 @@ console.log(latestRecord);
                 </div>
                 <div className="flex justify-between items-center mb-2">
                   <span className="text-gray-600">Thời gian vào:</span>
-                  <span className="font-medium">{formatDateTime(latestRecord.entryTime)}</span>
+                  <span className="font-medium">{
+                    recordsParking[0] && recordsParking[0].entryTime
+                      ? formatDateTime(recordsParking[0].entryTime)
+                      : ''
+                  }</span>
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="text-gray-600">Thời gian ra:</span>
-                  <span className="font-medium">{formatDateTime(latestRecord.exitTime)}</span>
+                  <span className="font-medium">{
+                    recordsParking[0] && recordsParking[0].exitTime
+                      ? formatDateTime(recordsParking[0].exitTime)
+                      : 'Chưa ra'
+                  }</span>
                 </div>
               </div>
 
