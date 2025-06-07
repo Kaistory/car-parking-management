@@ -1,5 +1,5 @@
 import StatsCards from './DashBoard/StatsCards';
-import MediaStats from "../components/MediaStats";
+import MediaStats from "../components/DashBoard/MediaStats";
 import TrafficChart from '../components/DashBoard/TrafficChart';
 
 const MainContent = () =>{

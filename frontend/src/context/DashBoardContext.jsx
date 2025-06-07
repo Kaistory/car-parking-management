@@ -197,7 +197,14 @@ export const DashBoardContextProvider = ({ children, user }) =>{
         }
         setApartment((prevApartments) => [...prevApartments, response]);
     }, []);
-
+    const createRecord = useCallback(async (newRecord) => {
+        console.log(newRecord);
+        const response = await postRequest(`${baseUrl}/parking/records`, JSON.stringify(newRecord));
+        if (response.error) {
+            return console.error("Failed to create recordsParking");
+        }
+        setRecordsParking((prevRecords) => [...prevRecords, response]);
+    }, []);
     return <DashBoardContext.Provider value = 
     {{  activeItem,
         updateActiveItem,
@@ -217,6 +224,7 @@ export const DashBoardContextProvider = ({ children, user }) =>{
         createFee,
         updateRecordById,
         deleteRecordById,
+        createRecord,
         trafficData
     }}>{children}
     </DashBoardContext.Provider>

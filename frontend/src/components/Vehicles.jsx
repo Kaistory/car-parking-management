@@ -1,22 +1,13 @@
 import React, { useState, useContext } from 'react';
-import { Edit, Trash2, Plus, X, Check } from 'lucide-react';
+import { Edit, Trash2, Plus, X, Check, ChevronLeft, ChevronRight } from 'lucide-react';
 import { DashBoardContext } from '../context/DashboardContext';
+
 const Vehicles = () => {
   const {vehicleResident, updateVehicleById, deleteVehicleById, createVehicle, apartment} = useContext(DashBoardContext);
-  // const [vehicles, setVehicles] = useState([
-  //   { _id: 1, apartmentId: 'APT001', plateNumber: '30A-12345', vehicleType: 'Car', rfidTag: 'RFID001' },
-  //   { _id: 2, apartmentId: 'APT002', plateNumber: '29B-67890', vehicleType: 'Motorcycle', rfidTag: 'RFID002' },
-  //   { _id: 3, apartmentId: 'APT003', plateNumber: '30C-11111', vehicleType: 'Car', rfidTag: 'RFID003' },
-  //   { _id: 4, apartmentId: 'APT001', plateNumber: '29D-22222', vehicleType: 'Motorcycle', rfidTag: 'RFID004' },
-  //   { _id: 5, apartmentId: 'APT004', plateNumber: '30E-33333', vehicleType: 'Car', rfidTag: 'RFID005' },
-  //   { _id: 6, apartmentId: 'APT002', plateNumber: '29F-44444', vehicleType: 'Bicycle', rfidTag: 'RFID006' },
-  //   { _id: 7, apartmentId: 'APT005', plateNumber: '30G-55555', vehicleType: 'Car', rfidTag: 'RFID007' },
-  //   { _id: 8, apartmentId: 'APT003', plateNumber: '29H-66666', vehicleType: 'Motorcycle', rfidTag: 'RFID008' },
-  //   { _id: 9, apartmentId: 'APT006', plateNumber: '30I-77777', vehicleType: 'Car', rfidTag: 'RFID009' },
-  //   { _id: 10, apartmentId: 'APT004', plateNumber: '29J-88888', vehicleType: 'Bicycle', rfidTag: 'RFID010' }
-  // ]);
+
   const [vehicles, setVehicles] = useState(vehicleResident);
   const [entriesPerPage, setEntriesPerPage] = useState(10);
+  const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState('');
   const [sortConfig, setSortConfig] = useState({ key: null, direction: 'asc' });
   
@@ -26,7 +17,7 @@ const Vehicles = () => {
   
   // Add states
   const [showAddModal, setShowAddModal] = useState(false);
-  const [addForm, setAddForm] = useState({ apartmentId: '', plateNumber: '', vehicleType: 'Car', rfidTag: '' });
+  const [addForm, setAddForm] = useState({ apartmentId: '', plateNumber: '', vehicleType: 'Ô tô', rfidTag: '' });
 
   // Available apartment IDs (in real app, this would come from API)
   const availableApartments = apartment.map(a => a._id);
@@ -56,11 +47,23 @@ const Vehicles = () => {
     }
   });
 
+  // Pagination calculations
+  const totalPages = Math.ceil(sortedVehicles.length / entriesPerPage);
+  const startIndex = (currentPage - 1) * entriesPerPage;
+  const endIndex = startIndex + entriesPerPage;
+  const currentVehicles = sortedVehicles.slice(startIndex, endIndex);
+
+  // Reset to first page when search term or entries per page changes
+  React.useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, entriesPerPage]);
+
   const handleSort = (key) => {
     setSortConfig(prev => ({
       key,
       direction: prev.key === key && prev.direction === 'asc' ? 'desc' : 'asc'
     }));
+    setCurrentPage(1); // Reset to first page when sorting
   };
 
   const getSortIcon = (columnKey) => {
@@ -68,6 +71,45 @@ const Vehicles = () => {
       return '↕️';
     }
     return sortConfig.direction === 'asc' ? '↑' : '↓';
+  };
+
+  // Pagination functions
+  const goToPage = (page) => {
+    setCurrentPage(page);
+  };
+
+  const goToPreviousPage = () => {
+    setCurrentPage(prev => Math.max(prev - 1, 1));
+  };
+
+  const goToNextPage = () => {
+    setCurrentPage(prev => Math.min(prev + 1, totalPages));
+  };
+
+  // Generate page numbers for pagination
+  const getPageNumbers = () => {
+    const pages = [];
+    const maxVisiblePages = 5;
+    
+    if (totalPages <= maxVisiblePages) {
+      for (let i = 1; i <= totalPages; i++) {
+        pages.push(i);
+      }
+    } else {
+      const halfVisible = Math.floor(maxVisiblePages / 2);
+      let startPage = Math.max(currentPage - halfVisible, 1);
+      let endPage = Math.min(startPage + maxVisiblePages - 1, totalPages);
+      
+      if (endPage - startPage < maxVisiblePages - 1) {
+        startPage = Math.max(endPage - maxVisiblePages + 1, 1);
+      }
+      
+      for (let i = startPage; i <= endPage; i++) {
+        pages.push(i);
+      }
+    }
+    
+    return pages;
   };
 
   // Edit functions
@@ -84,12 +126,12 @@ const Vehicles = () => {
   const handleSaveEdit = () => {
     // Validation
     if (!editForm.apartmentId.trim()) {
-      alert('Please select an apartment _id');
+      alert('Vui lòng chọn mã căn hộ');
       return;
     }
 
     if (!editForm.plateNumber.trim()) {
-      alert('Please enter a plate number');
+      alert('Vui lòng nhập biển số xe');
       return;
     }
 
@@ -99,7 +141,7 @@ const Vehicles = () => {
       vehicle.plateNumber.toLowerCase() === editForm.plateNumber.trim().toLowerCase()
     );
     if (plateExists) {
-      alert('Plate number already exists');
+      alert('Biển số xe đã tồn tại');
       return;
     }
 
@@ -110,7 +152,7 @@ const Vehicles = () => {
         vehicle.rfidTag.toLowerCase() === editForm.rfidTag.trim().toLowerCase()
       );
       if (rfidExists) {
-        alert('RFID tag already exists');
+        alert('Thẻ RFID đã tồn tại');
         return;
       }
     }
@@ -127,11 +169,11 @@ const Vehicles = () => {
         : vehicle
     ));
     updateVehicleById({
-    _id: editingId,
-    apartmentId: editForm.apartmentId.trim(),
-    plateNumber: editForm.plateNumber.trim(),
-    vehicleType: editForm.vehicleType,
-    rfidTag: editForm.rfidTag.trim()
+      _id: editingId,
+      apartmentId: editForm.apartmentId.trim(),
+      plateNumber: editForm.plateNumber.trim(),
+      vehicleType: editForm.vehicleType,
+      rfidTag: editForm.rfidTag.trim()
     });
     setEditingId(null);
     setEditForm({ apartmentId: '', plateNumber: '', vehicleType: '', rfidTag: '' });
@@ -152,7 +194,7 @@ const Vehicles = () => {
   // Add functions
   const openAddModal = () => {
     setShowAddModal(true);
-    setAddForm({ apartmentId: '', plateNumber: '', vehicleType: 'Car', rfidTag: '' });
+    setAddForm({ apartmentId: '', plateNumber: '', vehicleType: 'Ô tô', rfidTag: '' });
   };
 
   const handleAddInputChange = (field, value) => {
@@ -165,12 +207,12 @@ const Vehicles = () => {
   const handleSaveNewVehicle = () => {
     // Validation
     if (!addForm.apartmentId.trim()) {
-      alert('Please select an apartment _id');
+      alert('Vui lòng chọn mã căn hộ');
       return;
     }
 
     if (!addForm.plateNumber.trim()) {
-      alert('Please enter a plate number');
+      alert('Vui lòng nhập biển số xe');
       return;
     }
 
@@ -179,7 +221,7 @@ const Vehicles = () => {
       vehicle.plateNumber.toLowerCase() === addForm.plateNumber.trim().toLowerCase()
     );
     if (plateExists) {
-      alert('Plate number already exists');
+      alert('Biển số xe đã tồn tại');
       return;
     }
 
@@ -189,7 +231,7 @@ const Vehicles = () => {
         vehicle.rfidTag.toLowerCase() === addForm.rfidTag.trim().toLowerCase()
       );
       if (rfidExists) {
-        alert('RFID tag already exists');
+        alert('Thẻ RFID đã tồn tại');
         return;
       }
     }
@@ -210,22 +252,28 @@ const Vehicles = () => {
     
     // Close modal and reset form
     setShowAddModal(false);
-    setAddForm({ apartmentId: '', plateNumber: '', vehicleType: 'Car', rfidTag: '' });
+    setAddForm({ apartmentId: '', plateNumber: '', vehicleType: '', rfidTag: '' });
     
     // Show success message
-    alert('Vehicle added successfully!');
+    alert('Thêm phương tiện thành công!');
   };
 
   const handleCancelAdd = () => {
     setShowAddModal(false);
-    setAddForm({ apartmentId: '', plateNumber: '', vehicleType: 'Car', rfidTag: '' });
+    setAddForm({ apartmentId: '', plateNumber: '', vehicleType: '', rfidTag: '' });
   };
 
   // Delete function
   const handleDelete = (_id) => {
-    if (window.confirm('Are you sure you want to delete this vehicle?')) {
+    if (window.confirm('Bạn có chắc chắn muốn xóa phương tiện này?')) {
       deleteVehicleById(_id);
       setVehicles(prev => prev.filter(vehicle => vehicle._id !== _id));
+      
+      // Adjust current page if needed after deletion
+      const newTotalPages = Math.ceil((sortedVehicles.length - 1) / entriesPerPage);
+      if (currentPage > newTotalPages && newTotalPages > 0) {
+        setCurrentPage(newTotalPages);
+      }
     }
   };
 
@@ -239,14 +287,14 @@ const Vehicles = () => {
             className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md flex items-center gap-2 transition-colors"
           >
             <Plus size={16} />
-            Add Resident Vehicle
+            Thêm phương tiện cư dân
           </button>
         </div>
 
         {/* Controls */}
         <div className="p-4 border-b border-gray-200 flex justify-between items-center">
           <div className="flex items-center gap-2">
-            <span className="text-gray-600">Show</span>
+            <span className="text-gray-600">Hiển thị</span>
             <select 
               value={entriesPerPage}
               onChange={(e) => setEntriesPerPage(Number(e.target.value))}
@@ -257,17 +305,17 @@ const Vehicles = () => {
               <option value={50}>50</option>
               <option value={100}>100</option>
             </select>
-            <span className="text-gray-600">entries</span>
+            <span className="text-gray-600">mục</span>
           </div>
 
           <div className="flex items-center gap-2">
-            <span className="text-gray-600">Search:</span>
+            <span className="text-gray-600">Tìm kiếm:</span>
             <input
               type="text"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="border border-gray-300 rounded px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              placeholder=""
+              placeholder="Nhập từ khóa..."
             />
           </div>
         </div>
@@ -278,14 +326,14 @@ const Vehicles = () => {
             <thead className="bg-gray-50">
               <tr>
                 <th className="px-4 py-3 text-left text-sm font-medium text-gray-600 border-b border-gray-200">
-                  #
+                  STT
                 </th>
                 <th 
                   className="px-4 py-3 text-left text-sm font-medium text-gray-600 border-b border-gray-200 cursor-pointer hover:bg-gray-100"
                   onClick={() => handleSort('apartmentId')}
                 >
                   <div className="flex items-center gap-1">
-                    Apartment _id
+                    Căn hộ
                     <span className="text-xs">{getSortIcon('apartmentId')}</span>
                   </div>
                 </th>
@@ -294,7 +342,7 @@ const Vehicles = () => {
                   onClick={() => handleSort('plateNumber')}
                 >
                   <div className="flex items-center gap-1">
-                    Plate Number
+                    Biển số xe
                     <span className="text-xs">{getSortIcon('plateNumber')}</span>
                   </div>
                 </th>
@@ -303,7 +351,7 @@ const Vehicles = () => {
                   onClick={() => handleSort('vehicleType')}
                 >
                   <div className="flex items-center gap-1">
-                    Vehicle Type
+                    Loại xe
                     <span className="text-xs">{getSortIcon('vehicleType')}</span>
                   </div>
                 </th>
@@ -312,20 +360,20 @@ const Vehicles = () => {
                   onClick={() => handleSort('rfidTag')}
                 >
                   <div className="flex items-center gap-1">
-                    RFID Tag
+                    Thẻ RFID
                     <span className="text-xs">{getSortIcon('rfidTag')}</span>
                   </div>
                 </th>
                 <th className="px-4 py-3 text-left text-sm font-medium text-gray-600 border-b border-gray-200">
-                  Actions
+                  Thao tác
                 </th>
               </tr>
             </thead>
             <tbody>
-              {sortedVehicles.slice(0, entriesPerPage).map((vehicle, index) => (
+              {currentVehicles.map((vehicle, index) => (
                 <tr key={vehicle._id} className="hover:bg-gray-50 border-b border-gray-100">
                   <td className="px-4 py-3 text-sm text-gray-900">
-                    {index + 1}
+                    {startIndex + index + 1}
                   </td>
                   <td className="px-4 py-3 text-sm text-gray-900">
                     {editingId === vehicle._id ? (
@@ -334,7 +382,7 @@ const Vehicles = () => {
                         onChange={(e) => handleInputChange('apartmentId', e.target.value)}
                         className="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                       >
-                        <option value="">Select Apartment</option>
+                        <option value="">Chọn căn hộ</option>
                         {availableApartments.map(aptId => (
                           <option key={aptId} value={aptId}>{apartment.find(a => a._id === aptId)?.apartmentNumber}</option>
                         ))}
@@ -352,7 +400,7 @@ const Vehicles = () => {
                         value={editForm.plateNumber}
                         onChange={(e) => handleInputChange('plateNumber', e.target.value)}
                         className="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        placeholder="e.g., 30A-12345"
+                        placeholder="VD: 30A-12345"
                       />
                     ) : (
                       <span className="font-mono font-semibold">
@@ -373,9 +421,9 @@ const Vehicles = () => {
                       </select>
                     ) : (
                       <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                        vehicle.vehicleType === 'Car' ? 'bg-green-100 text-green-800' :
-                        vehicle.vehicleType === 'Motorbike' ? 'bg-orange-100 text-orange-800' :
-                        vehicle.vehicleType === 'Bicycle' ? 'bg-purple-100 text-purple-800' :
+                        vehicle.vehicleType === 'Ô tô' || vehicle.vehicleType === 'Car' ? 'bg-green-100 text-green-800' :
+                        vehicle.vehicleType === 'Xe máy' || vehicle.vehicleType === 'Motorbike' ? 'bg-orange-100 text-orange-800' :
+                        vehicle.vehicleType === 'Xe đạp' || vehicle.vehicleType === 'Bicycle' ? 'bg-purple-100 text-purple-800' :
                         'bg-gray-100 text-gray-800'
                       }`}>
                         {vehicle.vehicleType}
@@ -389,11 +437,11 @@ const Vehicles = () => {
                         value={editForm.rfidTag}
                         onChange={(e) => handleInputChange('rfidTag', e.target.value)}
                         className="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        placeholder="e.g., RFID001"
+                        placeholder="VD: RFID001"
                       />
                     ) : (
                       <span className="px-2 py-1 bg-gray-100 text-gray-700 rounded text-xs font-mono">
-                        {vehicle.rfidTag || 'N/A'}
+                        {vehicle.rfidTag || 'Không có'}
                       </span>
                     )}
                   </td>
@@ -404,14 +452,14 @@ const Vehicles = () => {
                           <button
                             onClick={handleSaveEdit}
                             className="p-1 text-green-600 hover:text-green-800 hover:bg-green-50 rounded transition-colors"
-                            title="Save"
+                            title="Lưu"
                           >
                             <Check size={16} />
                           </button>
                           <button
                             onClick={handleCancelEdit}
                             className="p-1 text-gray-600 hover:text-gray-800 hover:bg-gray-50 rounded transition-colors"
-                            title="Cancel"
+                            title="Hủy"
                           >
                             <X size={16} />
                           </button>
@@ -421,14 +469,14 @@ const Vehicles = () => {
                           <button
                             onClick={() => handleEdit(vehicle)}
                             className="p-1 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded transition-colors"
-                            title="Edit"
+                            title="Sửa"
                           >
                             <Edit size={16} />
                           </button>
                           <button
                             onClick={() => handleDelete(vehicle._id)}
                             className="p-1 text-red-600 hover:text-red-800 hover:bg-red-50 rounded transition-colors"
-                            title="Delete"
+                            title="Xóa"
                           >
                             <Trash2 size={16} />
                           </button>
@@ -442,11 +490,67 @@ const Vehicles = () => {
           </table>
         </div>
 
-        {/* Footer */}
-        <div className="p-4 text-sm text-gray-600 border-t border-gray-200">
-          Showing {Math.min(entriesPerPage, filteredVehicles.length)} of {filteredVehicles.length} entries
-          {searchTerm && ` (filtered from ${vehicles.length} total entries)`}
-        </div>
+        {/* Pagination */}
+        {totalPages > 1 && (
+          <div className="p-4 border-t border-gray-200 flex items-center justify-between">
+            <div className="text-sm text-gray-600">
+              Hiển thị {startIndex + 1} đến {Math.min(endIndex, sortedVehicles.length)} trên {sortedVehicles.length} mục
+              {searchTerm && ` (đã lọc từ ${vehicles.length} tổng số mục)`}
+            </div>
+            
+            <div className="flex items-center gap-2">
+              <button
+                onClick={goToPreviousPage}
+                disabled={currentPage === 1}
+                className={`p-2 rounded-md ${
+                  currentPage === 1 
+                    ? 'text-gray-400 cursor-not-allowed' 
+                    : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
+                } transition-colors`}
+                title="Trang trước"
+              >
+                <ChevronLeft size={16} />
+              </button>
+              
+              <div className="flex items-center gap-1">
+                {getPageNumbers().map((pageNum) => (
+                  <button
+                    key={pageNum}
+                    onClick={() => goToPage(pageNum)}
+                    className={`px-3 py-1 rounded-md text-sm ${
+                      currentPage === pageNum
+                        ? 'bg-blue-500 text-white'
+                        : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
+                    } transition-colors`}
+                  >
+                    {pageNum}
+                  </button>
+                ))}
+              </div>
+              
+              <button
+                onClick={goToNextPage}
+                disabled={currentPage === totalPages}
+                className={`p-2 rounded-md ${
+                  currentPage === totalPages 
+                    ? 'text-gray-400 cursor-not-allowed' 
+                    : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
+                } transition-colors`}
+                title="Trang sau"
+              >
+                <ChevronRight size={16} />
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Footer - only show when no pagination */}
+        {totalPages <= 1 && (
+          <div className="p-4 text-sm text-gray-600 border-t border-gray-200">
+            Hiển thị {Math.min(entriesPerPage, filteredVehicles.length)} trên {filteredVehicles.length} mục
+            {searchTerm && ` (đã lọc từ ${vehicles.length} tổng số mục)`}
+          </div>
+        )}
       </div>
 
       {/* Add Vehicle Modal */}
@@ -456,7 +560,7 @@ const Vehicles = () => {
             <div className="p-6">
               {/* Modal Header */}
               <div className="flex justify-between items-center mb-6">
-                <h2 className="text-xl font-semibold text-gray-900">Add New Vehicle</h2>
+                <h2 className="text-xl font-semibold text-gray-900">Thêm phương tiện mới</h2>
                 <button
                   onClick={handleCancelAdd}
                   className="text-gray-400 hover:text-gray-600 transition-colors p-1"
@@ -469,14 +573,14 @@ const Vehicles = () => {
               <div className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Apartment Id <span className="text-red-500">*</span>
+                    Căn hộ <span className="text-red-500">*</span>
                   </label>
                   <select
                     value={addForm.apartmentId}
                     onChange={(e) => handleAddInputChange('apartmentId', e.target.value)}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   >
-                    <option value="">Select an apartment</option>
+                    <option value="">Chọn căn hộ</option>
                     {availableApartments.map(aptId => (
                       <option key={aptId} value={aptId}>{apartment.find(a => a._id === aptId)?.apartmentNumber}</option>
                     ))}
@@ -485,20 +589,20 @@ const Vehicles = () => {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Plate Number <span className="text-red-500">*</span>
+                    Biển số xe <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="text"
                     value={addForm.plateNumber}
                     onChange={(e) => handleAddInputChange('plateNumber', e.target.value)}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    placeholder="e.g., 30A-12345"
+                    placeholder="VD: 30A-12345"
                   />
                 </div>
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Vehicle Type
+                    Loại xe
                   </label>
                   <select
                     value={addForm.vehicleType}
@@ -513,14 +617,14 @@ const Vehicles = () => {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    RFID Tag
+                    Thẻ RFID
                   </label>
                   <input
                     type="text"
                     value={addForm.rfidTag}  
                     onChange={(e) => handleAddInputChange('rfidTag', e.target.value)}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    placeholder="e.g., RFID001 (optional)"
+                    placeholder="VD: RFID001 (tùy chọn)"
                   />
                 </div>
               </div>
@@ -532,15 +636,15 @@ const Vehicles = () => {
                   className="mt-4 flex-1 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md transition-colors flex items-center justify-center gap-2 font-medium"
                 >
                   <Check size={16} />
-                  Add Vehicle
+                  Thêm phương tiện
                 </button>
             
                 <button
                   onClick={handleCancelAdd}
-                  className="mt-4 flex-1 bg-blue-500 hover:bg-gray-600 text-white px-4 py-2 rounded-md transition-colors flex items-center justify-center gap-2 font-medium"
+                  className="mt-4 flex-1 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md transition-colors flex items-center justify-center gap-2 font-medium"
                 >
                   <X size={16} />
-                  Cancel
+                  Hủy
                 </button>
               </div>
             </div>

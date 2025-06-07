@@ -26,7 +26,7 @@ const Register = () => {
     e.preventDefault();
     setRegisterError(null);
     if (registerInfo.password !== registerInfo.confirmPassword) {
-      setRegisterError({ error: true, message: "Passwords do not match" });
+      setRegisterError({ error: true, message: "Mật khẩu không khớp" });
       return;
     }
     setIsRegisterLoading(true);
@@ -67,12 +67,12 @@ const Register = () => {
           <Col className="login-center">
             {!showOtp ? (
               <>
-                <h2>Create your account</h2>
-                <p>Please fill in your details</p>
+                <h2>Tạo tài khoản của bạn</h2>
+                <p>Vui lòng điền thông tin chi tiết</p>
                 <Stack>
                   <Form.Control
                     type="text"
-                    placeholder="Username"
+                    placeholder="Tên người dùng"
                     value={registerInfo.username}
                     onChange={(e) =>
                       setRegisterInfo({ ...registerInfo, username: e.target.value })
@@ -93,7 +93,7 @@ const Register = () => {
                   <Col className="pass-input-div">
                     <Form.Control
                       type={showPassword ? "text" : "password"}
-                      placeholder="Password"
+                      placeholder="Mật khẩu"
                       value={registerInfo.password}
                       onChange={(e) =>
                         setRegisterInfo({ ...registerInfo, password: e.target.value })
@@ -110,7 +110,7 @@ const Register = () => {
                   <Col className="pass-input-div">
                     <Form.Control
                       type={showConfirm ? "text" : "password"}
-                      placeholder="Confirm Password"
+                      placeholder="Xác nhận mật khẩu"
                       value={registerInfo.confirmPassword}
                       onChange={(e) =>
                         setRegisterInfo({
@@ -134,19 +134,19 @@ const Register = () => {
                   </Col>
                   <Col className="login-center-buttons">
                     <Button variant="primary" type="submit">
-                      {isRegisterLoading ? "Registering..." : "Register"}
+                      {isRegisterLoading ? "Đang đăng ký..." : "Đăng ký"}
                     </Button>
                   </Col>
                 </Stack>
               </>
             ) : (
               <>
-                <h2>Enter OTP</h2>
-                <p>We have sent a verification code to your email.</p>
+                <h2>Nhập mã OTP</h2>
+                <p>Chúng tôi đã gửi mã xác minh đến email của bạn.</p>
                 <Stack>
                   <Form.Control
                     type="text"
-                    placeholder="Enter OTP"
+                    placeholder="Nhập mã OTP"
                     value={otp}
                     onChange={(e) => setOtp(e.target.value)}
                     className="login-input"
@@ -159,7 +159,7 @@ const Register = () => {
                   )}
                   <Col className="login-center-buttons">
                     <Button variant="primary" type="submit">
-                      {isOtpLoading ? "Verifying..." : "Verify"}
+                      {isOtpLoading ? "Đang xác minh..." : "Xác minh"}
                     </Button>
                   </Col>
                 </Stack>
@@ -169,14 +169,14 @@ const Register = () => {
           <p className="login-bottom-p">
             {showOtp ? (
               <>
-                Didn't receive the code? <a href="#">Resend</a>
+                Không nhận được mã? <a href="#">Gửi lại</a>
               </>
             ) : (
               <>
-                Already have an account? <a href="#" onClick={e => {
+                Đã có tài khoản? <a href="#" onClick={e => {
                     e.preventDefault();
                     navigate("/login");
-                  }}>Login</a>
+                  }}>Đăng nhập</a>
               </>
             )}
           </p>

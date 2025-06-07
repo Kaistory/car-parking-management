@@ -1,5 +1,5 @@
 import { Home, Users, Car, Coins, BarChart3, Calendar, Mail, Archive, Clock, Layers, FileText, Grid, TrendingUp, TrendingDown, Facebook, Twitter, Linkedin, Bell, Search, MessageSquare } from 'lucide-react';
-import { DashBoardContext } from '../context/DashboardContext'
+import { DashBoardContext } from '../../context/DashboardContext'
 import { useContext } from 'react';
 const MediaStats = () =>{
     const {apartment,vehicleResident,feesParking} = useContext(DashBoardContext);
@@ -9,7 +9,7 @@ const MediaStats = () =>{
                 <Users className="w-8 h-8" />
                 <div className="text-right">
                   <p className="text-2xl font-bold">{apartment.length}</p>
-                  <p className="text-sm opacity-90">Apartment</p>
+                  <p className="text-sm opacity-90">Căn chung cư</p>
                 </div>
               </div>
               
@@ -17,7 +17,7 @@ const MediaStats = () =>{
                 <Car className="w-8 h-8" />
                 <div className="text-right">
                   <p className="text-2xl font-bold">{vehicleResident.length}</p>
-                  <p className="text-sm opacity-90">Resident Vehicle</p>
+                  <p className="text-sm opacity-90">Xe cư dân </p>
                 </div>
               </div>
               
@@ -25,7 +25,7 @@ const MediaStats = () =>{
                 <Coins className="w-8 h-8" />
                 <div className="text-right">
                   <p className="text-2xl font-bold">{feesParking.length}</p>
-                  <p className="text-sm opacity-90">Fee</p>
+                  <p className="text-sm opacity-90">Phí</p>
                 </div>
               </div>
             </div>

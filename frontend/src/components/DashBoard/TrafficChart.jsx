@@ -65,19 +65,19 @@ const TrafficChart = () =>{
               <div className="flex justify-center space-x-6 mt-4 text-sm">
                 <div className="flex items-center">
                   <div className="w-3 h-3 bg-green-500 rounded-full mr-2"></div>
-                  <span className="text-gray-600">Car(60%)</span>
+                  <span className="text-gray-600">Ô tô</span>
                 </div>
                 <div className="flex items-center">
                   <div className="w-3 h-3 bg-blue-500 rounded-full mr-2"></div>
-                  <span className="text-gray-600">Motobike(20%)</span>
+                  <span className="text-gray-600">Xe máy</span>
                 </div>
                 <div className="flex items-center">
                   <div className="w-3 h-3 bg-purple-500 rounded-full mr-2"></div>
-                  <span className="text-gray-600">Bike (15%)</span>
+                  <span className="text-gray-600">Xe đạp</span>
                 </div>
                 <div className="flex items-center">
                   <div className="w-3 h-3 bg-cyan-500 rounded-full mr-2"></div>
-                  <span className="text-gray-600">All</span>
+                  <span className="text-gray-600">Tất cả</span>
                 </div>
               </div>
             </div>

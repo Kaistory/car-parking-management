@@ -1,11 +1,13 @@
 import React, { useState , useContext, useEffect} from 'react';
-import { Edit, Trash2, Plus, X, Check } from 'lucide-react';
+import { Edit, Trash2, Plus, X, Check, ChevronLeft, ChevronRight, FileSpreadsheet } from 'lucide-react';
 import { DashBoardContext } from '../context/DashboardContext'
+import * as XLSX from 'xlsx';
 
 const Resident = () => {
   const {apartment, updateApartmentById,deleteApartmentById,createApartment} = useContext(DashBoardContext);
   const [apartments, setApartments] = useState(apartment);
   const [entriesPerPage, setEntriesPerPage] = useState(10);
+  const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState('');
   const [sortConfig, setSortConfig] = useState({ key: null, direction: 'asc' });
   
@@ -39,11 +41,23 @@ const Resident = () => {
     }
   });
 
+  // Pagination calculations
+  const totalPages = Math.ceil(sortedApartments.length / entriesPerPage);
+  const startIndex = (currentPage - 1) * entriesPerPage;
+  const endIndex = startIndex + entriesPerPage;
+  const currentApartments = sortedApartments.slice(startIndex, endIndex);
+
+  // Reset to first page when search term changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, entriesPerPage]);
+
   const handleSort = (key) => {
     setSortConfig(prev => ({
       key,
       direction: prev.key === key && prev.direction === 'asc' ? 'desc' : 'asc'
     }));
+    setCurrentPage(1); // Reset to first page when sorting
   };
 
   const getSortIcon = (columnKey) => {
@@ -51,6 +65,105 @@ const Resident = () => {
       return '↕️';
     }
     return sortConfig.direction === 'asc' ? '↑' : '↓';
+  };
+
+  // Excel Export Function
+  const exportToExcel = () => {
+    try {
+      // Prepare data for export
+      const dataToExport = sortedApartments.map((apartment, index) => ({
+        'STT': index + 1,
+        'Số căn hộ': apartment.apartmentNumber,
+        'Tên chủ sở hữu': apartment.ownerName || 'Chưa có chủ',
+        'Tầng': apartment.floor,
+        'Diện tích (m²)': apartment.area
+      }));
+
+      // Create workbook and worksheet
+      const wb = XLSX.utils.book_new();
+      const ws = XLSX.utils.json_to_sheet(dataToExport);
+
+      // Set column widths
+      const colWidths = [
+        { wch: 5 },   // STT
+        { wch: 15 },  // Số căn hộ
+        { wch: 25 },  // Tên chủ sở hữu
+        { wch: 8 },   // Tầng
+        { wch: 15 }   // Diện tích
+      ];
+      ws['!cols'] = colWidths;
+
+      // Add worksheet to workbook
+      XLSX.utils.book_append_sheet(wb, ws, 'Danh sách căn hộ');
+
+      // Generate filename with current date
+      const now = new Date();
+      const dateString = now.toISOString().split('T')[0]; // YYYY-MM-DD format
+      const timeString = now.toTimeString().split(' ')[0].replace(/:/g, '-'); // HH-MM-SS format
+      const filename = `danh-sach-can-ho_${dateString}_${timeString}.xlsx`;
+
+      // Save file
+      XLSX.writeFile(wb, filename);
+
+      // Show success message
+      alert(`Đã xuất thành công ${sortedApartments.length} căn hộ ra file Excel!`);
+    } catch (error) {
+      console.error('Lỗi khi xuất file Excel:', error);
+      alert('Có lỗi xảy ra khi xuất file Excel. Vui lòng thử lại!');
+    }
+  };
+
+  // Pagination functions
+  const goToPage = (page) => {
+    setCurrentPage(page);
+  };
+
+  const goToPreviousPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1);
+    }
+  };
+
+  const goToNextPage = () => {
+    if (currentPage < totalPages) {
+      setCurrentPage(currentPage + 1);
+    }
+  };
+
+  // Generate page numbers for pagination
+  const getPageNumbers = () => {
+    const pageNumbers = [];
+    const maxVisiblePages = 5;
+    
+    if (totalPages <= maxVisiblePages) {
+      for (let i = 1; i <= totalPages; i++) {
+        pageNumbers.push(i);
+      }
+    } else {
+      if (currentPage <= 3) {
+        for (let i = 1; i <= 4; i++) {
+          pageNumbers.push(i);
+        }
+        pageNumbers.push('...');
+        pageNumbers.push(totalPages);
+      } else if (currentPage >= totalPages - 2) {
+        pageNumbers.push(1);
+        pageNumbers.push('...');
+        for (let i = totalPages - 3; i <= totalPages; i++) {
+          pageNumbers.push(i);
+        }
+      } else {
+        pageNumbers.push(1);
+        pageNumbers.push('...');
+        for (let i = currentPage - 1; i <= currentPage + 1; i++) {
+          pageNumbers.push(i);
+        }
+        pageNumbers.push('...');
+        pageNumbers.push(totalPages);
+      }
+    }
+    
+    return pageNumbers;
   };
 
   // Edit functions
@@ -190,9 +303,16 @@ const Resident = () => {
   const handleDelete = (_id) => {
     if (window.confirm('Bạn có chắc chắn muốn xóa căn hộ này?')) {
       deleteApartmentById(_id);
-      setApartments(prev => prev.filter(apt => apt._id !== _id));    
+      setApartments(prev => prev.filter(apt => apt._id !== _id));
+      
+      // Adjust current page if necessary
+      const newTotalPages = Math.ceil((sortedApartments.length - 1) / entriesPerPage);
+      if (currentPage > newTotalPages && newTotalPages > 0) {
+        setCurrentPage(newTotalPages);
+      }
     }
   };
+
   // useEffect to update apartments from context
   useEffect(() => {
     setApartments(apartment);
@@ -202,13 +322,22 @@ const Resident = () => {
     <div className="p-6 bg-gray-50 min-h-screen">
       <div className="bg-white rounded-lg shadow-sm">
         {/* Header */}
-        <div className="p-4 border-b border-gray-200">
+        <div className="p-4 border-b border-gray-200 flex justify-between items-center">
           <button 
             onClick={openAddModal}
             className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md flex items-center gap-2 transition-colors"
           >
             <Plus size={16} />
             Thêm căn hộ
+          </button>
+          
+          <button 
+            onClick={exportToExcel}
+            className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-md flex items-center gap-2 transition-colors"
+            title="Xuất file Excel"
+          >
+            <FileSpreadsheet size={16} />
+            Xuất Excel
           </button>
         </div>
 
@@ -221,12 +350,11 @@ const Resident = () => {
               onChange={(e) => setEntriesPerPage(Number(e.target.value))}
               className="border border-gray-300 rounded px-2 py-1 text-sm"
             >
+              <option value={5}>5</option>
               <option value={10}>10</option>
-              <option value={25}>25</option>
-              <option value={50}>50</option>
-              <option value={100}>100</option>
+              <option value={15}>15</option>
             </select>
-            <span className="text-gray-600">mục</span>
+            <span className="text-gray-600">mục mỗi trang</span>
           </div>
 
           <div className="flex items-center gap-2">
@@ -291,10 +419,10 @@ const Resident = () => {
               </tr>
             </thead>
             <tbody>
-              {sortedApartments.slice(0, entriesPerPage).map((apartment, index) => (
+              {currentApartments.map((apartment, index) => (
                 <tr key={apartment._id} className="hover:bg-gray-50 border-b border-gray-100">
                   <td className="px-4 py-3 text-sm text-gray-900">
-                    {index + 1}
+                    {startIndex + index + 1}
                   </td>
                   <td className="px-4 py-3 text-sm text-gray-900">
                     {editingId === apartment._id ? (
@@ -397,11 +525,75 @@ const Resident = () => {
           </table>
         </div>
 
-        {/* Footer */}
-        <div className="p-4 text-sm text-gray-600 border-t border-gray-200">
-          Hiển thị {Math.min(entriesPerPage, filteredApartments.length)} trên {filteredApartments.length} mục
-          {searchTerm && ` (đã lọc từ ${apartments.length} tổng số mục)`}
-        </div>
+        {/* Pagination */}
+        {totalPages > 1 && (
+          <div className="p-4 border-t border-gray-200 flex items-center justify-between">
+            <div className="text-sm text-gray-600">
+              Hiển thị {startIndex + 1} đến {Math.min(endIndex, sortedApartments.length)} trên {sortedApartments.length} mục
+              {searchTerm && ` (đã lọc từ ${apartments.length} tổng số mục)`}
+            </div>
+            
+            <div className="flex items-center gap-2">
+              {/* Previous button */}
+              <button
+                onClick={goToPreviousPage}
+                disabled={currentPage === 1}
+                className={`px-3 py-1 rounded-md text-sm flex items-center gap-1 transition-colors ${
+                  currentPage === 1 
+                    ? 'text-gray-400 cursor-not-allowed' 
+                    : 'text-gray-600 hover:text-gray-800 hover:bg-gray-100'
+                }`}
+              >
+                <ChevronLeft size={16} />
+                Trước
+              </button>
+              
+              {/* Page numbers */}
+              <div className="flex items-center gap-1">
+                {getPageNumbers().map((pageNum, index) => (
+                  <React.Fragment key={index}>
+                    {pageNum === '...' ? (
+                      <span className="px-2 py-1 text-gray-400">...</span>
+                    ) : (
+                      <button
+                        onClick={() => goToPage(pageNum)}
+                        className={`px-3 py-1 rounded-md text-sm transition-colors ${
+                          currentPage === pageNum
+                            ? 'bg-blue-500 text-white'
+                            : 'text-gray-600 hover:text-gray-800 hover:bg-gray-100'
+                        }`}
+                      >
+                        {pageNum}
+                      </button>
+                    )}
+                  </React.Fragment>
+                ))}
+              </div>
+              
+              {/* Next button */}
+              <button
+                onClick={goToNextPage}
+                disabled={currentPage === totalPages}
+                className={`px-3 py-1 rounded-md text-sm flex items-center gap-1 transition-colors ${
+                  currentPage === totalPages 
+                    ? 'text-gray-400 cursor-not-allowed' 
+                    : 'text-gray-600 hover:text-gray-800 hover:bg-gray-100'
+                }`}
+              >
+                Sau
+                <ChevronRight size={16} />
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Footer when no pagination needed */}
+        {totalPages <= 1 && (
+          <div className="p-4 text-sm text-gray-600 border-t border-gray-200">
+            Hiển thị {filteredApartments.length} trên {filteredApartments.length} mục
+            {searchTerm && ` (đã lọc từ ${apartments.length} tổng số mục)`}
+          </div>
+        )}
       </div>
 
       {/* Add Apartment Modal */}
@@ -491,7 +683,7 @@ const Resident = () => {
                 </button>
                 <button
                   onClick={handleCancelAdd}
-                  className="mt-4 flex-1 bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-md transition-colors flex items-center justify-center gap-2 font-medium"
+                  className="mt-4 flex-1 bg-gray-500 hover:bg-gray-600 text-white px-6 py-2 rounded-md transition-colors flex items-center justify-center gap-2 font-medium"
                 >
                   <X size={16} />
                   Hủy

@@ -25,8 +25,8 @@ const Login = () => {
             <img src={Logo} alt="" />
           </Col>
           <Col className="login-center">
-            <h2>Welcome back!</h2>
-            <p>Please enter your details</p>
+            <h2>Chào mừng trở lại!</h2>
+            <p>Vui lòng nhập thông tin của bạn</p>
             <Stack>
               <Form.Control 
                             type="email" 
@@ -39,7 +39,7 @@ const Login = () => {
               <Col className="pass-input-div">
                 <Form.Control 
                             type={showPassword ? "text" : "password"}
-                            placeholder="Password" 
+                            placeholder="Mật khẩu" 
                             onChange={(e) => updateLoginInfo({
                                 ...loginInfo, password: e.target.value
                             })} 
@@ -61,28 +61,28 @@ const Login = () => {
                 <Col className="remember-div">
                   <input type="checkbox" id="remember-checkbox" />
                   <label htmlFor="remember-checkbox">
-                    Remember for 30 days
+                    Ghi nhớ trong 30 ngày
                   </label>
                 </Col>
                 <a href="#" className="forgot-pass-link">
-                  Forgot password?
+                  Quên mật khẩu?
                 </a>
               </Col>
               <Col className="login-center-buttons">
-                <Button variant="primary" type="submit" onClick={loginUser}>{isLoginLoading ? "Getting you in..." : "Login"}</Button>
-                <Button variant="primary" type="submit" onClick={1}>
+                <Button variant="primary" type="submit" onClick={loginUser}>{isLoginLoading ? "Đang đăng nhập..." : "Đăng nhập"}</Button>
+                <Button variant="primary" type="submit" onClick={(e) => {}}>
                   <img src={GoogleSvg} alt="" />
-                  Log In with Google
+                  Đăng nhập với Google
                 </Button>
               </Col>
             </Stack>
           </Col>
 
           <p className="login-bottom-p">
-            Don't have an account? <a href="#"onClick={e => {
+            Chưa có tài khoản? <a href="#"onClick={e => {
                     e.preventDefault();
                     navigate("/register");
-                  }}>Sign Up</a>
+                  }}>Đăng ký</a>
           </p>
         </Col>
       </Col>

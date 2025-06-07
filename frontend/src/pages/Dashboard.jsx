@@ -6,7 +6,6 @@ import { DashBoardContext } from "../context/DashboardContext";
 import Resident from '../components/Apartment';
 import Vehicles from '../components/Vehicles';
 import ParkingRecords from "../components/ParkingRecords";
-import RealTimeParking from "../components/RealTimeParking";
 import ParkingFrees from "../components/ParkingFees";
 import ParkingPayments from "../components/ParkingPayments";
 import ControllerParking from '../components/ControllerParking';

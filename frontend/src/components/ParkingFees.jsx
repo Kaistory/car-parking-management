@@ -1,18 +1,9 @@
 import React, { useState,useContext } from 'react';
 import { Edit, Trash2, Plus, X, Check } from 'lucide-react';
 import { DashBoardContext } from '../context/DashboardContext';
+
 const ParkingFees = () => {
   const { feesParking, updateFeeById, deleteFeeById, createFee } = useContext(DashBoardContext);
-  // const [parkingFees, setParkingFees] = useState([
-  //   { _id: "6833f5d50eb50789395627f6", vehicleType: 'Motorcycle', feeAmount: 50000, effectiveDate: "2024-01-01T00:00:00.000Z", __v: 0 },
-  //   { _id: "6833f5d50eb50789395627f7", vehicleType: 'Car', feeAmount: 200000, effectiveDate: "2024-01-01T00:00:00.000Z", __v: 0 },
-  //   { _id: "6833f5d50eb50789395627f8", vehicleType: 'Bicycle', feeAmount: 20000, effectiveDate: "2024-02-01T00:00:00.000Z", __v: 0 },
-  //   { _id: "6833f5d50eb50789395627f9", vehicleType: 'Electric Scooter', feeAmount: 75000, effectiveDate: "2024-01-15T00:00:00.000Z", __v: 0 },
-  //   { _id: "6833f5d50eb50789395627fa", vehicleType: 'Truck', feeAmount: 500000, effectiveDate: "2024-03-01T00:00:00.000Z", __v: 0 },
-  //   { _id: "6833f5d50eb50789395627fb", vehicleType: 'Bus', feeAmount: 800000, effectiveDate: "2024-02-15T00:00:00.000Z", __v: 0 },
-  //   { _id: "6833f5d50eb50789395627fc", vehicleType: 'Van', feeAmount: 300000, effectiveDate: "2024-01-20T00:00:00.000Z", __v: 0 },
-  //   { _id: "6833f5d50eb50789395627fd", vehicleType: 'SUV', feeAmount: 250000, effectiveDate: "2024-02-10T00:00:00.000Z", __v: 0 }
-  // ]);
 
   const [parkingFees, setParkingFees] = useState(feesParking);
   const [entriesPerPage, setEntriesPerPage] = useState(10);
@@ -106,17 +97,17 @@ const ParkingFees = () => {
   const handleSaveEdit = () => {
     // Validation
     if (!editForm.vehicleType.trim()) {
-      alert('Please enter vehicle type');
+      alert('Vui lòng nhập loại phương tiện');
       return;
     }
 
     if (!editForm.feeAmount || isNaN(editForm.feeAmount) || parseFloat(editForm.feeAmount) <= 0) {
-      alert('Please enter a valid fee amount');
+      alert('Vui lòng nhập số tiền phí hợp lệ');
       return;
     }
 
     if (!editForm.effectiveDate) {
-      alert('Please select effective date');
+      alert('Vui lòng chọn ngày có hiệu lực');
       return;
     }
 
@@ -172,24 +163,24 @@ const ParkingFees = () => {
   const handleSaveNewParkingFee = () => {
     // Validation
     if (!addForm.vehicleType.trim()) {
-      alert('Please enter vehicle type');
+      alert('Vui lòng nhập loại phương tiện');
       return;
     }
 
     if (!addForm.feeAmount || isNaN(addForm.feeAmount) || parseFloat(addForm.feeAmount) <= 0) {
-      alert('Please enter a valid fee amount');
+      alert('Vui lòng nhập số tiền phí hợp lệ');
       return;
     }
 
     if (!addForm.effectiveDate) {
-      alert('Please select effective date');
+      alert('Vui lòng chọn ngày có hiệu lực');
       return;
     }
 
     // Check if vehicle type already exists
     const exists = parkingFees.some(fee => fee.vehicleType.toLowerCase() === addForm.vehicleType.trim().toLowerCase());
     if (exists) {
-      alert('Vehicle type already exists');
+      alert('Loại phương tiện đã tồn tại');
       return;
     }
 
@@ -210,7 +201,7 @@ const ParkingFees = () => {
     setAddForm({ vehicleType: '', feeAmount: '', effectiveDate: '' });
     
     // Show success message
-    alert('Parking fee added successfully!');
+    alert('Thêm phí gửi xe thành công!');
   };
 
   const handleCancelAdd = () => {
@@ -220,7 +211,7 @@ const ParkingFees = () => {
 
   // Delete function
   const handleDelete = (_id) => {
-    if (window.confirm('Are you sure you want to delete this parking fee?')) {
+    if (window.confirm('Bạn có chắc chắn muốn xóa phí gửi xe này không?')) {
       deleteFeeById(_id);
       setParkingFees(prev => prev.filter(fee => fee._id !== _id));
     }
@@ -236,35 +227,33 @@ const ParkingFees = () => {
             className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md flex items-center gap-2 transition-colors"
           >
             <Plus size={16} />
-            Add Parking Fee
+            Thêm Phí Gửi Xe
           </button>
         </div>
 
         {/* Controls */}
         <div className="p-4 border-b border-gray-200 flex justify-between items-center">
           <div className="flex items-center gap-2">
-            <span className="text-gray-600">Show</span>
+            <span className="text-gray-600">Hiển thị</span>
             <select 
               value={entriesPerPage}
               onChange={(e) => setEntriesPerPage(Number(e.target.value))}
               className="border border-gray-300 rounded px-2 py-1 text-sm"
             >
               <option value={10}>10</option>
-              <option value={25}>25</option>
-              <option value={50}>50</option>
-              <option value={100}>100</option>
+              
             </select>
-            <span className="text-gray-600">entries</span>
+            <span className="text-gray-600">mục</span>
           </div>
 
           <div className="flex items-center gap-2">
-            <span className="text-gray-600">Search:</span>
+            <span className="text-gray-600">Tìm kiếm:</span>
             <input
               type="text"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="border border-gray-300 rounded px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              placeholder="Search vehicle type, amount, or date..."
+              placeholder="Tìm kiếm loại xe, phí hoặc ngày..."
             />
           </div>
         </div>
@@ -275,14 +264,14 @@ const ParkingFees = () => {
             <thead className="bg-gray-50">
               <tr>
                 <th className="px-4 py-3 text-left text-sm font-medium text-gray-600 border-b border-gray-200">
-                  #
+                  STT
                 </th>
                 <th 
                   className="px-4 py-3 text-left text-sm font-medium text-gray-600 border-b border-gray-200 cursor-pointer hover:bg-gray-100"
                   onClick={() => handleSort('vehicleType')}
                 >
                   <div className="flex items-center gap-1">
-                    Vehicle Type
+                    Loại Phương Tiện
                     <span className="text-xs">{getSortIcon('vehicleType')}</span>
                   </div>
                 </th>
@@ -291,7 +280,7 @@ const ParkingFees = () => {
                   onClick={() => handleSort('feeAmount')}
                 >
                   <div className="flex items-center gap-1">
-                    Fee Amount
+                    Số Tiền Phí
                     <span className="text-xs">{getSortIcon('feeAmount')}</span>
                   </div>
                 </th>
@@ -300,12 +289,12 @@ const ParkingFees = () => {
                   onClick={() => handleSort('effectiveDate')}
                 >
                   <div className="flex items-center gap-1">
-                    Effective Date
+                    Ngày Có Hiệu Lực
                     <span className="text-xs">{getSortIcon('effectiveDate')}</span>
                   </div>
                 </th>
                 <th className="px-4 py-3 text-left text-sm font-medium text-gray-600 border-b border-gray-200">
-                  Actions
+                  Thao Tác
                 </th>
               </tr>
             </thead>
@@ -322,7 +311,7 @@ const ParkingFees = () => {
                         value={editForm.vehicleType}
                         onChange={(e) => handleInputChange('vehicleType', e.target.value)}
                         className="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        placeholder="Vehicle type"
+                        placeholder="Loại phương tiện"
                       />
                     ) : (
                       <span className="font-medium">{parkingFee.vehicleType}</span>
@@ -335,7 +324,7 @@ const ParkingFees = () => {
                         value={editForm.feeAmount}
                         onChange={(e) => handleInputChange('feeAmount', e.target.value)}
                         className="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        placeholder="Fee amount"
+                        placeholder="Số tiền phí"
                         min="0"
                         step="1000"
                       />
@@ -366,14 +355,14 @@ const ParkingFees = () => {
                           <button
                             onClick={handleSaveEdit}
                             className="p-1 text-green-600 hover:text-green-800 hover:bg-green-50 rounded transition-colors"
-                            title="Save"
+                            title="Lưu"
                           >
                             <Check size={16} />
                           </button>
                           <button
                             onClick={handleCancelEdit}
                             className="p-1 text-gray-600 hover:text-gray-800 hover:bg-gray-50 rounded transition-colors"
-                            title="Cancel"
+                            title="Hủy"
                           >
                             <X size={16} />
                           </button>
@@ -383,14 +372,14 @@ const ParkingFees = () => {
                           <button
                             onClick={() => handleEdit(parkingFee)}
                             className="p-1 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded transition-colors"
-                            title="Edit"
+                            title="Chỉnh sửa"
                           >
                             <Edit size={16} />
                           </button>
                           <button
                             onClick={() => handleDelete(parkingFee._id)}
                             className="p-1 text-red-600 hover:text-red-800 hover:bg-red-50 rounded transition-colors"
-                            title="Delete"
+                            title="Xóa"
                           >
                             <Trash2 size={16} />
                           </button>
@@ -406,8 +395,8 @@ const ParkingFees = () => {
 
         {/* Footer */}
         <div className="p-4 text-sm text-gray-600 border-t border-gray-200">
-          Showing {Math.min(entriesPerPage, filteredParkingFees.length)} of {filteredParkingFees.length} entries
-          {searchTerm && ` (filtered from ${parkingFees.length} total entries)`}
+          Hiển thị {Math.min(entriesPerPage, filteredParkingFees.length)} trong {filteredParkingFees.length} mục
+          {searchTerm && ` (lọc từ ${parkingFees.length} tổng số mục)`}
         </div>
       </div>
 
@@ -418,7 +407,7 @@ const ParkingFees = () => {
             <div className="p-6">
               {/* Modal Header */}
               <div className="flex justify-between items-center mb-6">
-                <h2 className="text-xl font-semibold text-gray-900">Add New Parking Fee</h2>
+                <h2 className="text-xl font-semibold text-gray-900">Thêm Phí Gửi Xe Mới</h2>
                 <button
                   onClick={handleCancelAdd}
                   className="text-gray-400 hover:text-gray-600 transition-colors p-1"
@@ -431,27 +420,27 @@ const ParkingFees = () => {
               <div className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Vehicle Type <span className="text-red-500">*</span>
+                    Loại Phương Tiện <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="text"
                     value={addForm.vehicleType}
                     onChange={(e) => handleAddInputChange('vehicleType', e.target.value)}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    placeholder="e.g., Motorcycle, Car, Bicycle"
+                    placeholder="Vd: Xe máy, Ô tô, Xe đạp"
                   />
                 </div>
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Fee Amount (VND) <span className="text-red-500">*</span>
+                    Số Tiền Phí (VND) <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="number"
                     value={addForm.feeAmount}
                     onChange={(e) => handleAddInputChange('feeAmount', e.target.value)}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    placeholder="Enter fee amount in VND"
+                    placeholder="Nhập số tiền phí bằng VND"
                     min="0"
                     step="1000"
                   />
@@ -459,7 +448,7 @@ const ParkingFees = () => {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Effective Date <span className="text-red-500">*</span>
+                    Ngày Có Hiệu Lực <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="date"
@@ -474,17 +463,17 @@ const ParkingFees = () => {
               <div className="flex gap-3 mt-6">
                 <button
                   onClick={handleSaveNewParkingFee}
-                  className="flex-1 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md transition-colors flex items-center justify-center gap-2 font-medium"
+                  className="mt-4 flex-1 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md transition-colors flex items-center justify-center gap-2 font-medium"
                 >
                   <Check size={16} />
-                  Add Parking Fee
+                  Thêm Phí Gửi Xe
                 </button>
                 <button
                   onClick={handleCancelAdd}
-                  className="flex-1 bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-md transition-colors flex items-center justify-center gap-2 font-medium"
+                  className="mt-4 flex-1 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md transition-colors flex items-center justify-center gap-2 font-medium"
                 >
                   <X size={16} />
-                  Cancel
+                  Hủy
                 </button>
               </div>
             </div>

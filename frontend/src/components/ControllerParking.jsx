@@ -138,12 +138,12 @@ function formatDateTime(dateString) {
                 <button 
                 onClick={openFunction}
                 className="bg-green-500 hover:bg-green-500 text-white px-4 py-2 rounded-lg font-medium transition-colors">
-                  Open
+                  Mở 
                 </button>
                 <button 
                 onClick={closeFunction}
                 className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors">
-                  Close
+                  Đóng 
                 </button>
               </div>
             </div>
