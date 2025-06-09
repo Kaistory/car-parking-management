@@ -60,27 +60,28 @@ Dự án này xây dựng một hệ thống quản lý bãi đỗ xe thông min
 ## 📷 Hình ảnh giao diện
 
 ### 1. Trang Dashboard (Thống kê tổng quan)
-![Dashboard](https://prnt.sc/BtOJ80qlATpL)
+![Dashboard](image/Dashboard.png)
 
 ### 2. Quản lý căn hộ
-![Quản lý căn hộ](https://prnt.sc/pi_a5Ab1nmRU)
+![Quản lý căn hộ](image/Apartment.png)
 
 ### 3. Quản lý phương tiện
-![Quản lý phương tiện](https://prnt.sc/-IEbrksHGj3H)
+![Quản lý phương tiện](image/vehicles.png)
 
 ### 4. Ghi nhận vào/ra bãi xe
-![Ghi nhận vào/ra](https://prnt.sc/kJH0UStDoEDt)
+![Ghi nhận vào/ra](image/Out_in.png)
 
-### 5. Biểu đồ lưu lượng xe
-![Biểu đồ traffic](https://prnt.sc/WjFdAEXtx1_L)
+### 5. Danh sách lưu lượng xe
+![Biểu đồ traffic](image/Screenshot_450.png)
 
 ### 6. Thông tin thu phí các loại xe
-![Phí các loại xe](https://prnt.sc/MnX8FzevZi3P)
+![Phí các loại xe](image/Screenshot_451.png)
 
 ### 7. Đăng ký & đăng nhập tài khoản
-![Đăng ký tài khoản](https://prnt.sc/Ubr-LEwBV8be)
-![Đăng nhập tài khoản](https://prnt.sc/aKE_fxWtMdwz)
-
+![Đăng ký tài khoản](image/Screenshot_444.png)
+![Đăng nhập tài khoản](image/Screenshot_445.png)
+### 8. Hình ảnh phần cứng 
+![Phần cứng](image/Handware.jpg)
 > **Lưu ý:** Nếu chưa có thư mục `images`, hãy tạo và thêm ảnh chụp màn hình tương ứng để hiển thị đúng.
 
 ## 🚀 Hướng dẫn cài đặt & chạy
@@ -171,8 +172,21 @@ D5         <->    SCK
 D7         <->    MOSI
 D6         <->    MISO
 D3         <->    RST
-```
 
+ESP8266    <->    SERVO
+VIN       <->      VCC
+GND        <->    GND
+D4          <->   IN
+
+ESP8266    <->    LCD I2C
+VIN       <->      VCC
+GND        <->    GND
+D2         <->    SDA
+D1         <->    SCL
+
+ESP8266 <-> Button
+D0
+```
 ## 📖 API Documentation
 
 ### Authentication
