@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { Edit, Trash2, Plus, X, Check, FileSpreadsheet } from 'lucide-react';
+import { Edit, Trash2, Plus, X, Check, FileSpreadsheet, ChevronLeft, ChevronRight } from 'lucide-react';
 import { DashBoardContext } from '../context/DashboardContext';
 import { baseUrl, getRequest, postRequest } from "../utils/services";
 import * as XLSX from 'xlsx';
@@ -10,8 +10,10 @@ const ParkingRecords = () => {
 
   const [parkingRecords, setParkingRecords] = useState([]);
   const [entriesPerPage, setEntriesPerPage] = useState(10);
+  const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState('');
   const [sortConfig, setSortConfig] = useState({ key: null, direction: 'asc' });
+  
   // demo auto update
   useEffect(() => {
     const fetchInfo = async () => {
@@ -23,6 +25,7 @@ const ParkingRecords = () => {
                 }
             fetchInfo();
   }, [parkingRecords]);
+  
   // Edit states
   const [editingId, setEditingId] = useState(null);
   const [editForm, setEditForm] = useState({ 
@@ -100,6 +103,65 @@ const ParkingRecords = () => {
       return aValue > bValue ? -1 : aValue < bValue ? 1 : 0;
     }
   });
+
+  // Pagination calculations
+  const totalPages = Math.ceil(sortedRecords.length / entriesPerPage);
+  const startIndex = (currentPage - 1) * entriesPerPage;
+  const endIndex = startIndex + entriesPerPage;
+  const currentRecords = sortedRecords.slice(startIndex, endIndex);
+
+  // Reset to first page when search or entries per page changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, entriesPerPage]);
+
+  // Pagination functions
+  const goToPage = (page) => {
+    setCurrentPage(Math.max(1, Math.min(page, totalPages)));
+  };
+
+  const goToPreviousPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1);
+    }
+  };
+
+  const goToNextPage = () => {
+    if (currentPage < totalPages) {
+      setCurrentPage(currentPage + 1);
+    }
+  };
+
+  // Generate page numbers for pagination
+  const getPageNumbers = () => {
+    const pages = [];
+    const maxVisiblePages = 5;
+    
+    if (totalPages <= maxVisiblePages) {
+      for (let i = 1; i <= totalPages; i++) {
+        pages.push(i);
+      }
+    } else {
+      const startPage = Math.max(1, currentPage - 2);
+      const endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+      
+      if (startPage > 1) {
+        pages.push(1);
+        if (startPage > 2) pages.push('...');
+      }
+      
+      for (let i = startPage; i <= endPage; i++) {
+        pages.push(i);
+      }
+      
+      if (endPage < totalPages) {
+        if (endPage < totalPages - 1) pages.push('...');
+        pages.push(totalPages);
+      }
+    }
+    
+    return pages;
+  };
 
   const handleSort = (key) => {
     setSortConfig(prev => ({
@@ -275,6 +337,7 @@ const ParkingRecords = () => {
     }
   };
 
+
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
       <div className="bg-white rounded-lg shadow-sm">
@@ -306,10 +369,10 @@ const ParkingRecords = () => {
               onChange={(e) => setEntriesPerPage(Number(e.target.value))}
               className="border border-gray-300 rounded px-2 py-1 text-sm"
             >
+              <option value={5}>5</option>
               <option value={10}>10</option>
-              <option value={25}>25</option>
-              <option value={50}>50</option>
-              <option value={100}>100</option>
+              <option value={15}>15</option>
+              
             </select>
             <span className="text-gray-600">mục</span>
           </div>
@@ -388,10 +451,10 @@ const ParkingRecords = () => {
               </tr>
             </thead>
             <tbody>
-              {sortedRecords.slice(0, entriesPerPage).map((record, index) => (
+              {currentRecords.map((record, index) => (
                 <tr key={record._id} className="hover:bg-gray-50 border-b border-gray-100">
                   <td className="px-4 py-3 text-sm text-gray-900">
-                    {index + 1}
+                    {startIndex + index + 1}
                   </td>
                   <td className="px-4 py-3 text-sm text-gray-900">
                     {editingId === record._id ? (
@@ -519,6 +582,66 @@ const ParkingRecords = () => {
             </tbody>
           </table>
         </div>
+
+        {/* Pagination */}
+        {totalPages > 1 && (
+          <div className="p-4 border-t border-gray-200 flex items-center justify-between">
+            <div className="text-sm text-gray-700">
+              Hiển thị {startIndex + 1} đến {Math.min(endIndex, sortedRecords.length)} trong tổng số {sortedRecords.length} mục
+              {searchTerm && ` (lọc từ ${parkingRecords.length} mục)`}
+            </div>
+            
+            <div className="flex items-center gap-2">
+              {/* Previous button */}
+              <button
+                onClick={goToPreviousPage}
+                disabled={currentPage === 1}
+                className={`px-3 py-1 rounded-md flex items-center gap-1 text-sm ${
+                  currentPage === 1
+                    ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                    : 'bg-white border border-gray-300 text-gray-700 hover:bg-gray-50'
+                }`}
+              >
+                <ChevronLeft size={16} />
+                Trước
+              </button>
+
+              {/* Page numbers */}
+              <div className="flex items-center gap-1">
+                {getPageNumbers().map((page, index) => (
+                  <button
+                    key={index}
+                    onClick={() => typeof page === 'number' && goToPage(page)}
+                    disabled={page === '...'}
+                    className={`px-3 py-1 rounded-md text-sm ${
+                      page === currentPage
+                        ? 'bg-blue-500 text-white'
+                        : page === '...'
+                        ? 'bg-white text-gray-400 cursor-default'
+                        : 'bg-white border border-gray-300 text-gray-700 hover:bg-gray-50'
+                    }`}
+                  >
+                    {page}
+                  </button>
+                ))}
+              </div>
+
+              {/* Next button */}
+              <button
+                onClick={goToNextPage}
+                disabled={currentPage === totalPages}
+                className={`px-3 py-1 rounded-md flex items-center gap-1 text-sm ${
+                  currentPage === totalPages
+                    ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                    : 'bg-white border border-gray-300 text-gray-700 hover:bg-gray-50'
+                }`}
+              >
+                Sau
+                <ChevronRight size={16} />
+              </button>
+            </div>
+          </div>
+        )}
 
         {/* Footer */}
         <div className="p-4 text-sm text-gray-600 border-t border-gray-200">
