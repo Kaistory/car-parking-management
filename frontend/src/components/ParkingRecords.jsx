@@ -643,11 +643,11 @@ const ParkingRecords = () => {
           </div>
         )}
 
-        {/* Footer */}
+        {/* Footer
         <div className="p-4 text-sm text-gray-600 border-t border-gray-200">
           Hiển thị {Math.min(entriesPerPage, filteredRecords.length)} trong tổng số {filteredRecords.length} mục
           {searchTerm && ` (lọc từ ${parkingRecords.length} mục)`}
-        </div>
+        </div> */}
       </div>
 
       {/* Add Parking Record Modal */}
